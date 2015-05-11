@@ -1,0 +1,22 @@
+LABEL, Lineage Assignment by Extended Learning, version 0.3
+Sam Shepard (vfn4@cdc.gov), CDC/OID/NCIRD, 22 May 2012
+
+HARDWARE.
+We recommend a single multi-core machine with no fewer than 2 cores (8 to 12 cores work best) and at least 4 GB of RAM.  LABEL runtime is impacted by the number of cores available on a machine. Use with Mac OS X requires a 64 bit chipset.
+
+SOFTWARE PRE-REQUISITES.
++ Linux or Mac OS X (tested on Snow Leopard, Lion; CentOS 5.8, 6.2 & Ubuntu 12)
+ - BASH version 3 or later
+ - Standard utilities: sleep, cut, paste, jobs, zip, env, cat, cp, getopts.
+ - License: GPL (any)
++ Perl version 5 or later (tested 5.12.3)
+ - Standard includes: Getopt::Long, File::Basename
+ - License: GPL (any)
+
+INSTALLATION.
+1) Unzip the archive containing LABEL.
+2) Move the file "LABEL" and the directory "LABEL_RES" to a place in your PATH environment variable.  Otherwise, add the directory containing LABEL and LABEL_RES to your PATH.
+3) Restart your terminal emulator. Note: LABEL_RES and LABEL must be in the same folder.
+4) In your terminal emulator, execute: LABEL -I
+5) LABEL is now installed.  To test it, execute: LABEL test.fa test_project H9v2011
+6) The file "test.fa" is given in the deployment archive. To access LABEL without using the PATH variable, cd to your extracted directory & substitute "./LABEL" for "LABEL" above.

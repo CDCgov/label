@@ -1,0 +1,323 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\froman\fcharset0 TimesNewRomanPSMT;\f1\fmodern\fcharset0 CourierNewPSMT;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue255;\red2\green0\blue233;}
+{\info
+{\author CDC User}
+{\*\company Centers for Disease Control and Prevention}}\margl1080\margr1080\vieww33240\viewh20040\viewkind1\viewscale281
+\deftab720
+\pard\pardeftab720\ri0\qc
+
+\f0\i\b\fs22 \cf0 LABEL, Lineage Assignment by Extended Learning, version 0.4.3\
+Sam Shepard (vfn4@cdc.gov), CDC/OID/NCIRD, 29 October 2013\
+\pard\pardeftab720\ri0\ql\qnatural
+
+\i0\b0 \cf0 \
+\pard\pardeftab720\ri0\qj
+
+\i\b\fs24 \cf0 PURPOSE.\
+\pard\pardeftab720\ri0\qj
+
+\i0\b0\fs22 \cf0 LABEL\'92s purpose is to quickly, automatically, and correctly assign clades or lineages to nucleotide sequences.  Automated lineage assignment has applications in surveillance, research, and high-throughput database annotation.  Currently LABEL supports the lineage assignment of hemagglutinins for influenza A subtypes H5N1 and H9N2.\
+\pard\pardeftab720\ri0\qj
+
+\i\b \cf0 \
+\pard\pardeftab720\ri0\qj
+
+\fs24 \cf0 METHOD.\
+\pard\pardeftab720\ri0\qj
+
+\i0\b0\fs22 \cf0 Lineage Assignment By Extended Learning (LABEL) uses hidden Markov model (HMM) profiles of clade alignments--or groups of clades--to analyze query sequences and then classify them via machine learning techniques. The HMM scoring step is performed via SAM v3.5 (see {\field{\*\fldinst{HYPERLINK "http://compbio.soe.ucsc.edu/sam.html"}}{\fldrslt 
+\i \cf2 \ul \ulc2 compbio.soe.ucsc.edu/sam.html}} for more). Prediction is performed hierarchically--usually starting out at a more general level (e.g., a groups of clades) and going to a very specific terminal level (a particular clade). This roughly corresponds to the hierarchical structure of phylogenetic trees and the H5N1 nomenclature system. The prediction phase of LABEL is done via support vector machines (SVM) using the free SHOGUN Machine Learning Toolbox v1.1.0 (multi-class GMNP SVM with polynomial kernel of degree 20, 
+\i \cf2 \ul \ulc2 www.shogun-toolbox.org
+\i0 \cf0 \ulnone ). Optional sequence alignment (MUSCLE v3.8.31, see {\field{\*\fldinst{HYPERLINK "%22http://www.drive5.com/mus"}}{\fldrslt 
+\i \cf2 \ul www.drive5.com/muscle}}; MAFFT if available, see {\field{\*\fldinst{HYPERLINK "mafft.cbrc.jp/alignment/software"}}{\fldrslt mafft.cbrc.jp/alignment/software}}; or via SAM's 
+\i align2model 
+\i0 program) and tree-building functions are available to validate LABEL\'92s predictions  (GTR+GAMMA, 1000 local support bootstraps, maximum-likelihood tree using FastTreeMP v2.1.4, see {\field{\*\fldinst{HYPERLINK "http://www.microbesonline.org/fasttree"}}{\fldrslt 
+\i \cf2 \ul www.microbesonline.org/fasttree}}).\
+\
+\pard\pardeftab720\ri0\qj
+
+\i\b\fs24 \cf0 BROADER IMPACT.\
+\pard\pardeftab720\ri0\qj
+
+\i0\b0\fs22 \cf0 Although we have only constructed modules for H5 and H9, LABEL's methodology need not be limited to influenza A or even just viral sequences.  Given any phylogenetic tree with defined families or clades, one can train a LABEL module for automated lineage assignment.  Training is performed using a combination of support scripts and by manually applied expert knowledge.\
+\
+\pard\pardeftab720\ri0\qj
+
+\i\b\fs24 \cf0 ACCURACY & PERFORMANCE.\
+\pard\pardeftab720\ri0\qj
+
+\i0\b0\fs22 \cf0 On H5v2011 and H9v2011 full length sequences LABEL performs with 100% accuracy on tested datasets and runtime scales linearly at about a half-second per hemagglutinin sequence for a four core machine.  Full results are in pre-publication drafting and available upon request.  Choosing alignment options may increase the runtime significantly; however, guide sequence libraries are never more than 200 sequences in size.  For the best results using the alignment options, break down your query sequence file into smaller files.\
+\
+\pard\pardeftab720\ri0\qj
+
+\i\b\fs24 \cf0 USAGE.
+\i0\b0\fs22 \
+\pard\pardeftab720\ri0\qj
+
+\fs20 \cf0 	LABEL		[-P MAX_PROC] [-E C_OPT] [-W WRK_PATH|-O OUT_PATH] [-G|-TACRD|-S]\\\
+		 	[-L LIN_PATH] <nts.fasta> <project> <Module:H5v2011, H9v2011, etc.>\
+	-T	Do TRAINING again instead of using classifier files.\
+	-A	Do ALIGNMENT of re-annotated FASTA file (sorted by clade) & build its ML tree.\
+	-C	Do CONTROL alignment & ML tree construction.\
+	-E	SGE cluster option. Use 1 for SGE, 2 for SGE with array jobs, else local.\
+	-R	No RECURSIVE prediction. Limits scope, useful with -L option.\
+	-D	No DELETION of extra intermediary files.\
+	-S	Show available protein modules.\
+	-W	Web-server mode: requires ABSOLUTE path to WRITABLE working directory.\
+	-O	Output directory path, do not use with web mode.\
+	-G	Create a scoring matrix using given header annotations for Graphing.\
+	-I	Install/link LABEL binaries for your system (FRESH INSTALL).\
+\
+\pard\pardeftab720\ri0\qj
+
+\fs22 \cf0 EXAMPLE, get predictions & control tree:\
+	
+\f1 LABEL gisaid_H5N1.fa Bird_Flu H5v2011
+\f0 \
+EXAMPLE, use annotated sequence file to get a scoring matrix:\
+	
+\f1 LABEL -G annotated_H9.fa LPAI H9v2011
+\f0 	\
+\
+\pard\pardeftab720\ri0\qj
+
+\i\b\fs24 \cf0 DATA.\
+\pard\pardeftab720\li720\ri0\qj
+
+\f1\i0\b0\fs22 \cf0 o	
+\f0 LABEL takes FASTA formatted \ul nucleotide\ulnone  sequences.  The FASTA may be single or multi-line and may contain any number of sequences.  Extra sequences with redundant headers are removed (first-read, first kept)!  Commas and apostrophes are removed from headers while internal spaces are underlined.\
+
+\f1 o	
+\f0 LABEL generates re-annotated FASTA sequences, scoring data, Newick files, alignments, tab-delimited files, and miscellaneous text files.  LABEL's output is limited to text and creates no binaries or images. LABEL's output is limited to a specified output directory (or to a default working directory within the package) and to the current working directory of the calling user.\
+\pard\pardeftab720\ri0\qj
+\cf0 \
+\pard\pardeftab720\ri0\ql\qnatural
+
+\i\b\fs24 \cf0 FILES GENERATED.\
+\pard\pardeftab720\ri0\ql\qnatural
+
+\b0\fs20 \cf0 PROJ
+\i0 _final.tab			Standard. Tab-delimited headers & predicted clades.\
+
+\i PROJ
+\i0 _final.txt			Standard. A prettier output of the above.\
+
+\i LEVEL
+\i0 _trace.tab			Standard. Table of HMM scores at each level, suitable for visualization in R.\
+
+\i LEVEL
+\i0 _result.tab			Standard. For the current 
+\i prediction level
+\i0 , tab-delimited headers & predicted clades.\
+
+\i LEVEL
+\i0 _result.txt			Standard. For the current 
+\i prediction level
+\i0 , A prettier output of the above.\
+FASTA/				Standard. Folder containing fasta files and newick trees.\
+FASTA/
+\i PROJ
+\i0 _predictions.fas	Standard. Query sequence file with predictions added like: "_\{
+\i PRED
+\i0 :
+\i CLAD
+\i0 \}"\
+FASTA/
+\i MOD
+\i0 _control.fasta	Optional. Alignment of predictions fasta file and guide sequences.\
+FASTA/
+\i MOD
+\i0 _control.nwk	Optional. Maximum likelihood tree of the above.\
+FASTA/
+\i PROJ
+\i0 _reannotated.fas	Default.  Query file with annotations replaced with predicted ones, ordered by clade.\
+FASTA/
+\i PROJ
+\i0 _ordered.fasta	Optional. Aligned version of the above, still ordered by clade.\
+FASTA/
+\i PROJ
+\i0 _tree.nwk		Optional. Maximum likelihood tree of the above.\
+FASTA/
+\i PROJ
+\i0 _clade_
+\i CLAD
+\i0 .fas	Standard. The re-annotated file partitioned into separate clade files.\
+c-*/				Standard. Clade/lineage subfolder for the hierarchical predictions.\
+\
+
+\i The project name is denoted "PROJ", the lineage or clade is called "CLAD", and the module of interest as \'93MOD\'94.\
+\pard\pardeftab720\ri0\sl360\slmult1\ql\qnatural
+
+\fs22 \cf0 \
+
+\b MODULES.
+\i0\b0 \
+LABEL modules are merely directories within the 
+\i LABEL_RES/training_data
+\i0  folder and contain all associated pHMMs as well as SVM training data.  Extensions such 
+\i x-filter.txt
+\i0  control against inappropriate data input.  The guide tree for positive control (if desired) is listed as 
+\i MOD_downsample.fa 
+\i0 for MAFFT/MUSCLE alignment or in the 
+\i x-control 
+\i0 folder for faster pHMM alignment. Current included modules:\
+\
+H5v2011	Influenza A hemagglutinin module for subtype H5N1, current to 19 MAR 2012\
+H9v2011	Influenza A hemagglutinin module for subtype H9N2, current to 27 MAR 2012\
+\
+\
+\pard\pardeftab720\ri0\sa200\qj
+
+\i\b\fs24 \cf0 HARDWARE.\
+\pard\pardeftab720\ri0\sa200\qj
+
+\i0\b0\fs22 \cf0 We recommend a single multi-core machine with no fewer than 2 cores (8 or more threads work best) and at least 2 GB of RAM.  LABEL runtime is impacted by the number of cores available on a machine. Use with Mac OS X requires a 64 bit chipset.\
+\pard\pardeftab720\ri0\qj
+\cf0 \
+\pard\pardeftab720\ri0\sa200\qj
+
+\i\b\fs24 \cf0 SOFTWARE PRE-REQUISITES.
+\i0\b0 \
+\pard\pardeftab720\li720\ri0\ql\qnatural
+
+\f1\fs22 \cf0 o	
+\f0 Linux or Mac OS X (tested on Snow Leopard, Lion; CentOS 5.8, 6.2 & Ubuntu 12)\
+\pard\pardeftab720\li1440\ri0\ql\qnatural
+\cf0 -	BASH version 3 or later\
+-	Standard utilities: sleep, cut, paste, jobs, zip, env, cat, cp, getopts.\
+-	License: GPL (any)\
+\pard\pardeftab720\li720\ri0\ql\qnatural
+
+\f1 \cf0 o	
+\f0 Perl version 5 or later (tested 5.12.3)\
+\pard\pardeftab720\li1440\ri0\ql\qnatural
+\cf0 -	Standard includes: Getopt::Long, File::Basename\
+-	License: GPL (any)\
+\pard\pardeftab720\ri0\ql\qnatural
+\cf0 \
+\pard\pardeftab720\ri0\ql\qnatural
+
+\i\b\fs24 \cf0 PACKAGED SOFTWARE.\
+\
+\pard\pardeftab720\li720\ri0\ql\qnatural
+
+\f1\i0\b0\fs22 \cf0 o	
+\f0 SHOGUN version 1.0.0 or later (tested 1.1.0)\
+\pard\pardeftab720\li1440\ri0\ql\qnatural
+\cf0 -	Purpose: executes the SVM decision phase.\
+-	License: GPL v3\
+\pard\pardeftab720\li720\ri0\ql\qnatural
+
+\f1 \cf0 o	
+\f0 MUSCLE 3.8 or later (tested 3.8.11)\
+\pard\pardeftab720\li1440\ri0\ql\qnatural
+\cf0 -	Purpose: optionally align output or control\
+-	License: Public Domain\
+\pard\pardeftab720\li720\ri0\ql\qnatural
+
+\f1 \cf0 o	
+\f0 FastTreeMP 2.1.4 or later\
+\pard\pardeftab720\li1440\ri0\ql\qnatural
+\cf0 -	Purpose: optionally build trees\
+-	License: GPL (any)\
+\pard\pardeftab720\li720\ri0\ql\qnatural
+
+\f1 \cf0 o	
+\f0 SAM version 3.5 or later\
+\pard\pardeftab720\li1440\ri0\ql\qnatural
+\cf0 -	Purpose: build HMM profiles, score sequences for evaluation\
+-	License: Academic/Government, not-for-profit, redistributed with permission\
+\pard\pardeftab720\li720\ri0\ql\qnatural
+
+\f1 \cf0 o	
+\f0 BASH scripts\
+\pard\pardeftab720\li1440\ri0\ql\qnatural
+\cf0 -	Purpose: assist installation, main pipeline for LABEL\
+-	License: 
+\i owner
+\i0 , GPL\
+\pard\pardeftab720\li720\ri0\ql\qnatural
+
+\f1 \cf0 o	
+\f0 Perl scripts\
+\pard\pardeftab720\li1440\ri0\ql\qnatural
+\cf0 -	Purpose: data manipulation and formatting; calls SHOGUN for SVM use.\
+-	License: 
+\i owner
+\i0 , GPL.\
+\
+\pard\pardeftab720\ri0\ql\qnatural
+
+\i\b\fs24 \cf0 INSTALLATION
+\i0\b0 .\
+\pard\pardeftab720\li720\ri0\sl360\slmult1\ql\qnatural
+
+\fs22 \cf0 1)	Unzip the archive containing LABEL.\
+2)	Move the file \'93
+\f1 LABEL
+\f0 \'94 and the directory \'93
+\i LABEL_RES
+\i0 \'94 to a place in your 
+\f1 PATH
+\f0  environment variable.  Otherwise, add the directory containing 
+\f1 LABEL
+\f0  and 
+\i LABEL_RES
+\i0  to your 
+\f1 PATH
+\f0 .\
+3)	Restart your terminal emulator. Note: 
+\i LABEL_RES
+\i0  and 
+\f1 LABEL
+\f0  must be in the same folder.\
+4)	In your terminal emulator, execute: 
+\f1 LABEL \'96I
+\f0 \
+5)	LABEL is now installed.  To test it, execute: 
+\f1 LABEL test.fa test_proj H9v2011
+\f0 \
+6)	The file \'93
+\i test.fa
+\i0 \'94 is given in the deployment archive. To access LABEL without using the 
+\f1 PATH
+\f0  variable, 
+\f1 cd
+\f0  to your extracted directory & substitute \'93
+\f1 ./LABEL
+\f0 \'94 for \'93
+\f1 LABEL
+\f0 \'94 above.\
+\pard\pardeftab720\ri0\ql\qnatural
+
+\fs24 \cf0 \
+\pard\pardeftab720\ri0\ql\qnatural
+
+\i\b \cf0 LICENSE.\
+\pard\pardeftab720\ri0\ql\qnatural
+
+\i0\b0\fs22 \cf0 GPL version 3. This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\
+\
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\
+\
+You should have received a copy of the GNU General Public License along with this program.  If not, see {\field{\*\fldinst{HYPERLINK "http://www.gnu.org/licenses/"}}{\fldrslt 
+\i \cf2 \ul www.gnu.org/licenses/}}.\
+\pard\pardeftab720\ri0\ql\qnatural
+
+\fs24 \cf0 \
+\pard\pardeftab720\ri0\sa200\ql\qnatural
+
+\i\b \cf0 DICLAIMER & LIMITATION OF LIABILITY.\
+\pard\pardeftab720\ql\qnatural
+{\field{\*\fldinst{HYPERLINK "http://compbio.soe.ucsc.edu/sam2src/"}}{\fldrslt 
+\i0\b0\fs22 \cf3 \ul \ulc3 SAM (align2model,hmmscore,modelfromalign)}}
+\i0\b0\fs22  binaries may be used within LABEL for government and/or academic use only. Commercial use and redistribution for commercial use is excluded. Use of SAM implies this {\field{\*\fldinst{HYPERLINK "http://compbio.soe.ucsc.edu/sam-lic/obj.0"}}{\fldrslt \cf3 \ul \ulc3 license}}\cf3 \ul \ulc3 .
+\fs24 \
+\pard\pardeftab720\ql\qnatural
+
+\fs22 \cf0 \ulnone \
+\pard\pardeftab720\ri0\sa200\ql\qnatural
+\cf0 The materials embodied in this software are "as-is" and without warranty of any kind, express, implied or otherwise, including without limitation, any warranty of fitness for a particular purpose. In no event shall the Centers for Disease Control and Prevention (CDC) or the United States (U.S.) Government be liable to you or anyone else for any direct, special, incidental, indirect or consequential damages of any kind, or any damages whatsoever, including without limitation, loss of profit, loss of use, savings or revenue, or the claims of third parties, whether or not CDC or the U.S. Government has been advised of the possibility of such loss, however caused and on any theory of liability, arising out of or in connection with the possession, use or performance of this software.\'a0 In no event shall any other party who modifies and/or conveys the program as permitted according to GPL license [{\field{\*\fldinst{HYPERLINK "http://www.gnu.org/licenses/"}}{\fldrslt 
+\i \cf2 \ul www.gnu.org/licenses/}}], make CDC or the U.S. government liable for damages, including any general, special, incidental or consequential damages arising out of the use or inability to use the program, including but not limited to loss of data or data being rendered inaccurate or losses sustained by third parties or a failure of the program to operate with any other programs.\'a0 Any views, prepared by individuals as part of their official duties as United States government employees or as contractors of the United States government and expressed herein, do not necessarily represent the views of the United States government. Such individuals\'92 participation in any part of the associated work is not meant to serve as an official endorsement of the software. The CDC and the U.S. government shall not be held liable for damages resulting from any statements arising from use of or promotion of the software that may conflict with any official position of the United States government.\
+}
