@@ -36,7 +36,8 @@ GetOptions(
 		'training|T=s' => \$trainingFile,
 		'data-filter|D=s' => \$dataFilter,
 		'shogun-path|S' => \$shogunPath,
-		'best-score|B' => \$bestScoreMode
+		'best-score|B' => \$bestScoreMode,
+		'custom-reverse|C=s' => \$custRevPath
 	  );
 
 if ( scalar(@ARGV) < 2 ) {
@@ -50,6 +51,7 @@ if ( scalar(@ARGV) < 2 ) {
 	$message .= "\t\t--data-filter|D <FILE>\tFile for the data filter threshold (module-specific).\n";
 	$message .= "\t\t--shogun-path|S <PATH>\tPath to the shogun binary (OS-specific or linked).\n";
 	$message .= "\t\t--retrain|R\t\tSpecifies the classifier file does not exists.\n";
+	$message .= "\t\t-C|--custom-reverse <path>\tUse custom reverse corrected viterbi model. Path contains equivalent pHMMs.\n";
 	die($message."\n");
 }
 
@@ -175,11 +177,31 @@ if ( $numClasses != $numLabels ) {
 	die("$PROGRAM ERROR: Number classes ($numClasses) in $tpath/labels.dat different ($numLabels) from in .../info.dat).\n");
 }
 
+if ( defined($custRevPath) ) {
+	$xrev = 1;
+} else {
+	$xrev = 0;
+}
+
 # Process pHMM output
 $/ = "\n"; %bestLabelByID = (); $theScore = 0;
 for($i = 0; $i < $numLabels; $i++ ) {
 	$file = $ppath.'/'.$taxa[$i].'_hmm.tab';
        	open( IN, '<', $file ) or die("$PROGRAM ERROR: Cannot open $file.\n");
+	if ( $xrev ) {
+		@revValues = ();
+		%revScores = ();
+		$revFile = $custRevPath . '/' . $taxa[$i].'_hmm.tab';
+		open(REV,'<',$revFile) or die("Cannot open $revFile\n");
+		$revHeader = <REV>;
+		while($revLine =<REV> ) {
+			chomp($revLine);
+			@revValues = split("\t",$revLine);
+			$revScores{$revValues[0]} = $revValues[$scoreField];
+		}	
+		close(REV);
+	}	
+
 	$header = <IN>;
 	$label = $labels[$i];
 	while ( $line = <IN> ) {
@@ -189,7 +211,9 @@ for($i = 0; $i < $numLabels; $i++ ) {
 		$lengths{$id} = $values[1];
 		if ( $subtractNull ) {
 			$scores{$id}{$label} = sprintf("%.2f",$values[$scoreField] - $nulls{$id});
-			$theScore = $values[2];
+			$theScore = $values[2]; # not subtracted because neighborhood doesn't work
+		} elsif ( $xrev ) {
+			$theScore = $scores{$id}{$label} = sprintf("%.2f",$values[$scoreField] - $revScores{$id});
 		} else {
 			$scores{$id}{$label} = $values[$scoreField];
 			$theScore = $values[$scoreField];
@@ -304,6 +328,7 @@ for($i=0; $i < $Ni;$i++ ) {
 	}
 
 	if ( $dataFilter ) {
+		# There is a bound to the normalization to ensure appending regions don't unfairly affect the stats.
 		if ( $lengths{$id} > $maxLength ) {
 			$filterByID{$id} /= $maxLength;
 		} else {

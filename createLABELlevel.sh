@@ -113,6 +113,8 @@ function doCleanUp() {
 	rm $ppath/${mod}_IDs.dat $ppath/${mod}_${testrun}.tab $ppath/${mod}_${testrun}.tab.tmp
 	rm $ppath/${testrun}_result.txt $ppath/${testrun}_result.tab 2> /dev/null
 	rm ${taxa[*]/%/.dist} null.dist 2> /dev/null
+	[ "$use_xrev" -eq "1" ] && rm $tpath/x-rev/*fasta
+
 	if [ ! -d $tpath ];then
 		echo -e "$SELF ERROR: '$tpath' does not exist.\n"
 		exit 1
@@ -135,9 +137,6 @@ if [ ! -d $tpath ];then
 	done
 fi
 
-
-
-
 # Create HMMs
 banlist=$ppath/level_banlist.txt
 if [ -r $banlist ]; then
@@ -150,6 +149,8 @@ else
 	$spath/partitionTaxa.pl $alvl_file $tpath
 fi
 
+
+use_xrev=0
 rm $tpath/*_hmm.mod 2> /dev/null
 size=$(grep '>' $alvl_file -c)
 if [ -r null.fasta ];then 
@@ -162,7 +163,10 @@ else
 		rm $tpath/null.mod
 	fi
 
-	if [ -d $ppath/x-rev ];then
+	if [ -d $ppath/x-rev -o -d $mpath/x-rev ];then
+		use_xrev=1
+		[ ! -d $ppath/x-rev ] && mkdir $ppath/x-rev
+		[ ! -d $mpath/x-rev ] && mkdir $mpath/x-rev
 		echo "$SELF: using viterbi custom reverse corrected null model."
 	else
 		echo "$SELF: using reverse corrected null model."
@@ -178,6 +182,22 @@ for f in $tpath/*fasta;do
 	rm $m.weightoutput
 	mv $m.mod $tpath
 done
+
+if [ "$use_xrev" -eq "1" ];then
+	echo "$SELF: generating reverse pHMMs"
+	cd x-rev
+	for f in $tpath/*fasta;do
+		f2=$tpath/x-rev/$(basename $f .fasta).rev.fasta
+		$cpath/rev.pl -R $f > $f2
+		m=`basename $f .fasta`_hmm
+		taxa=(${taxa[*]} $m)
+		$spath/removeGapColumns.pl $f2
+		$spath/modelfromalign $m -alignfile $f2 -alphabet DNA 2> /dev/null 
+		rm $m.weightoutput
+		mv $m.mod $tpath/x-rev
+	done
+	cd -
+fi
 
 # Optimize training set
 max_correct=0
@@ -201,7 +221,7 @@ if [ ! -r $table ];then
 	fi
 
 	M=${#taxa[@]}
-	[ -d $mpath/x-rev ] && M=$(expr $M \* 2)
+	[ "$use_xrev" -eq "1" ] && M=$(expr $M \* 2)
 	A=$(expr $M \* $g)
 	[ $A -gt 1000 ] && g=$(expr 1001 / $M + 1)
 
@@ -287,7 +307,7 @@ EOL
 	if [ -r "$tpath/null.mod" ];then
 		$spath/buildDataMatrix.pl -F 4 $table ${taxa[*]/%/.tab} -N null.tab
 		err_test $? $LINENO
-	elif [ -r $mpath/x-rev ];then
+	elif [ "$use_xrev" -eq "1" ];then
 		$spath/buildDataMatrix.pl -F 3 $table ${taxa[*]/%/.tab} -C $ppath/x-rev
 		err_test $? $LINENO
 	else
@@ -313,7 +333,6 @@ echo "$SELF: calculating optimal training set"
 if [ ! -r "${mod}_test.dat" ] || [ ! -r "${mod}_IDs.dat" ];then
 	$cpath/randomTrainingSet.pl $table . -E -I -P ${mod}
 	mv ${mod}_training.dat ${mod}_test.dat
-	
 else
 	size=$(wc -l < ${mod}_IDs.dat)
 	echo "$SELF: test data already found"

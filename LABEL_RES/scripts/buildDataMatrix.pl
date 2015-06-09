@@ -27,7 +27,7 @@ use Getopt::Long;
 #TO-DO: Make normalized mode for data across all columns.
 
 GetOptions(	'lengths|L' => \$addLengths,'shorten-taxa|S' => \$SHORTEN, 'score-field|F=i' => \$scoreField,
-       		'null-model|N=s' => \$nullModel, 'column-minimum|M' => \$colMin 
+       		'null-model|N=s' => \$nullModel, 'column-minimum|M' => \$colMin, 'custom-reverse|C=s' => \$custRevPath
 );
 if ( scalar(@ARGV) < 2 ) {
 	$message = "Usage:\n\tperl $0 <output_file> <scores.tab> ... <scoresN.tab>\n";
@@ -36,6 +36,7 @@ if ( scalar(@ARGV) < 2 ) {
 	$message .= "\t\t-L|--lengths\t\t\tAdd the length field to the table.\n";
 	$message .= "\t\t-N|--null-model <null.mod>\tSpecify a null file.\n";
 	$message .= "\t\t-M|--column-minimum\t\t\tCalculate a column for the vector minimum.\n";
+	$message .= "\t\t-C|--custom-reverse <path>\tUse custom reverse corrected viterbi model. Path contains equivalent pHMMs.\n";
 	die($message);
 }
 
@@ -78,6 +79,13 @@ if ( defined($colMin) ) {
 	%minByID = ();
 }
 $/ = "\n";
+
+if ( defined($custRevPath) ) {
+	$xrev = 1;
+} else {
+	$xrev = 0;
+}
+
 foreach $file ( @ARGV ) {
 	# PROCESS labels & first record
        	open( IN, '<', $file ) or die("$0 ERROR: Cannot open $file.\n");
@@ -91,12 +99,28 @@ foreach $file ( @ARGV ) {
 		$taxon = $1;
 	} else {
 		die("$0 ERROR: Malformed file name ($file).\n");
+	}
+
+	if ( $xrev ) {
+		@revValues = ();
+		%revScores = ();
+		$revFile = $custRevPath . '/' . $file;
+		open(REV,'<',$revFile) or die("Cannot open $revFile\n");
+		$revHeader = <REV>;
+		while($revLine =<REV> ) {
+			chomp($revLine);
+			@revValues = split("\t",$revLine);
+			$revScores{$revValues[0]} = $revValues[$scoreField];
+		}	
+		close(REV);
 	}	
 
 	$id = $values[0];
 	$lengths{$id} = $values[1];
 	if ( $subtractNull ) {
 		$scores{$id}{$label} = sprintf("%.2f",$values[$scoreField] - $nulls{$id});
+	} elsif ( $xrev ) {
+		$scores{$id}{$label} = sprintf("%.2f",$values[$scoreField] - $revScores{$id});
 	} else {
 		$scores{$id}{$label} = $values[$scoreField];
 	}
