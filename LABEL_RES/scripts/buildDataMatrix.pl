@@ -35,7 +35,7 @@ if ( scalar(@ARGV) < 2 ) {
 	$message .= "\t\t-F|--score-field <#>\t\tScore field to build matrix (1-N, default 4).\n";
 	$message .= "\t\t-L|--lengths\t\t\tAdd the length field to the table.\n";
 	$message .= "\t\t-N|--null-model <null.mod>\tSpecify a null file.\n";
-	$message .= "\t\t-M|--column-minimum\t\t\tCalculate a column for the vector minimum.\n";
+	$message .= "\t\t-M|--column-minimum\t\tCalculate a column for the vector minimum.\n";
 	$message .= "\t\t-C|--custom-reverse <path>\tUse custom reverse corrected viterbi model. Path contains equivalent pHMMs.\n";
 	die($message);
 }
@@ -142,6 +142,8 @@ foreach $file ( @ARGV ) {
 		$lengths{$id} = $values[1];
 		if ( $subtractNull ) {
 			$scores{$id}{$label} = sprintf("%.2f",$values[$scoreField] - $nulls{$id});
+		} elsif ( $xrev ) {
+			$scores{$id}{$label} = sprintf("%.2f",$values[$scoreField] - $revScores{$id});
 		} else {
 			$scores{$id}{$label} = $values[$scoreField];
 		}
