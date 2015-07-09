@@ -12,7 +12,7 @@
 % A. Krogh et al., Hidden Markov models in computational biology:
 %  Applications to protein modeling, JMB 235:1501-1531, Feb 1994.
 % ---------------------------------------------------------------------
-%  B_PA_hmm   Host: login.aspen.biotech.cdc.gov    Tue Jun  9 14:34:37 2015
+%  B_PA_hmm   Host: node4.aspen.biotech.cdc.gov    Thu Jul  9 17:09:19 2015
 %  vfn4       Dir:  /scicomp/home/vfn4/IRMA/redo1/FLU-OG/x-rev
 % ---------------------------------------------------------------------
 %  Alignment weights from internal calc.  Total (35.93) Max (0.14) Min (0.02)
