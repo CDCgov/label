@@ -6,8 +6,9 @@
 # TURN ON or OFF analysis mode ##########
 analysis_mode=0	#   record into file	#
 P=8		#   parallel procs	#
-doAppend=1	#   whether to spike	#
+doAppend=0	#   whether to spike	#
 X=10		#   spike every X	#
+staticAppend=1  #   static appendix	#
 #########################################
 #########################################
 
@@ -69,7 +70,7 @@ appendix=$ppath/${testrun}_appendix.txt
 cd $ppath
 
 
-[ -r "$appendix" ] && rm $appendix
+[ -r "$appendix" -a "$staticAppend" -eq "0" ] && rm $appendix
 
 if [ $# -eq 5 ];then 
 	linpath=/$mod/$5
@@ -315,6 +316,8 @@ EOL
 		err_test $? $LINENO
 	fi
 else
+	size=$(wc -l < $table)
+	size=$(expr $size - 1)
 	echo "$SELF: scoring table found"
 fi
 
@@ -329,9 +332,14 @@ totExecuted=0
 
 #create GROUP
 echo "$SELF: calculating optimal training set"
-
-if [ ! -r "${mod}_test.dat" ] || [ ! -r "${mod}_IDs.dat" ];then
+if [ -r "${table}.test" ];then
+	$cpath/randomTrainingSet.pl ${table}.test . -E -I -P ${mod}
+	size=$(wc -l < ${table}.test)
+	size=$(expr $size - 1)
+	mv ${mod}_training.dat ${mod}_test.dat
+elif [ ! -r "${mod}_test.dat" ] || [ ! -r "${mod}_IDs.dat" ];then
 	$cpath/randomTrainingSet.pl $table . -E -I -P ${mod}
+	size=$(wc -l < ${mod}_IDs.dat)
 	mv ${mod}_training.dat ${mod}_test.dat
 else
 	size=$(wc -l < ${mod}_IDs.dat)
@@ -344,6 +352,7 @@ for n in $3;do
 		labels=$ppath/${mod}_K${n}-${r}_labels.dat
 		training=$ppath/${mod}_K${n}-${r}_training.dat
 		myLog=$ppath/${mod}.log
+		
 		$cpath/randomTrainingSet.pl $table . -S $n -D -P ${mod}_K${n}-${r} -A $appendix
 		err_test $? $LINENO
 #		if [ -r $tpath/null.mod ];then 
