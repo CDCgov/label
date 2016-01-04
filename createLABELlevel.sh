@@ -12,7 +12,15 @@ staticAppend=1  #   static appendix	#
 #########################################
 #########################################
 
-#
+# OS and ARCH
+if [ -x "`which uname`" ];then
+	OS=`uname -s`
+	if [ "$(uname -m)" != "x86_64" -a "$OS" == "Linux" ];then
+		OS="Linux32"
+	fi
+else
+	OS="Linux"
+fi
 
 SELF=$(basename $0 .sh)
 # FNC - ERROR TEST #
@@ -41,6 +49,9 @@ LABEL=$(which LABEL)
 spath=$(dirname $LABEL)/LABEL_RES/scripts
 tnpath=$(dirname $LABEL)/LABEL_RES/training_data
 cpath=$(dirname $LABEL)/LABEL_RES/scripts/creation
+modelfromalign=$spath/modelfromalign_$OS
+hmmscore=$spath/hmmscore_$OS
+shogun=$spath/shogun_$OS
 
 # need jot or seq
 if ( hash jot>/dev/null 2>&1 );then
@@ -155,7 +166,7 @@ use_xrev=0
 rm $tpath/*_hmm.mod 2> /dev/null
 size=$(grep '>' $alvl_file -c)
 if [ -r null.fasta ];then 
-	$spath/modelfromalign null -alignfile $ppath/null.fasta -alphabet DNA 2> /dev/null 
+	$modelfromalign null -alignfile $ppath/null.fasta -alphabet DNA 2> /dev/null 
 	rm $ppath/null.weightoutput
 	mv $ppath/null.mod $tpath
 	echo "$SELF: using custom null model"
@@ -179,7 +190,7 @@ for f in $tpath/*fasta;do
 	m=`basename $f .fasta`_hmm
 	taxa=(${taxa[*]} $m)
 	$spath/removeGapColumns.pl $f
-	$spath/modelfromalign $m -alignfile $f -alphabet DNA 2> /dev/null 
+	$modelfromalign $m -alignfile $f -alphabet DNA 2> /dev/null 
 	rm $m.weightoutput
 	mv $m.mod $tpath
 done
@@ -193,7 +204,7 @@ if [ "$use_xrev" -eq "1" ];then
 		m=`basename $f .fasta`_hmm
 		taxa=(${taxa[*]} $m)
 		$spath/removeGapColumns.pl $f2
-		$spath/modelfromalign $m -alignfile $f2 -alphabet DNA 2> /dev/null 
+		$modelfromalign $m -alignfile $f2 -alphabet DNA 2> /dev/null 
 		rm $m.weightoutput
 		mv $m.mod $tpath/x-rev
 	done
@@ -246,7 +257,7 @@ chmod 755 $qscript
 cat >>$qscript <<EOL
 declare -a mods=($mpath/null.mod $mpath/*hmm.mod)
 run=\$(basename \${mods[\$m]} .mod)_\$l
-$spath/hmmscore \$run -db \$db -modelfile \${mods[\$m]} -subtract_null 0
+$hmmscore \$run -db \$db -modelfile \${mods[\$m]} -subtract_null 0
 EOL
 	elif [ -d $mpath/x-rev ]; then
 		[ ! -d $ppath/x-rev ] && mkdir $ppath/x-rev
@@ -255,14 +266,14 @@ cat >>$qscript <<EOL
 declare -a mods=($mpath/*hmm.mod $mpath/x-rev/*hmm.mod)
 pat=\$(dirname \${mods[\$m]});pat=\$(basename \$pat);[[ "\$pat" == "x-rev" ]] && cd x-rev
 run=\$(basename \${mods[\$m]} .mod)_\$l
-$spath/hmmscore \$run -db \$db -modelfile \${mods[\$m]} -subtract_null 1 -dpstyle 1
+$hmmscore \$run -db \$db -modelfile \${mods[\$m]} -subtract_null 1 -dpstyle 1
 EOL
 	else
 		declare -a mods=($mpath/*hmm.mod)
 cat >>$qscript <<EOL
 declare -a mods=($mpath/*hmm.mod)
 run=\$(basename \${mods[\$m]} .mod)_\$l
-$spath/hmmscore \$run -db \$db -modelfile \${mods[\$m]}
+$hmmscore \$run -db \$db -modelfile \${mods[\$m]}
 EOL
 	fi
 
@@ -289,7 +300,7 @@ EOL
 				sleep 0.5
 				joblist=($(jobs -p))
 			done
-			$spath/hmmscore $run -db $db -modelfile ${mods[$m]} >/dev/null 2>&1 &
+			$hmmscore $run -db $db -modelfile ${mods[$m]} >/dev/null 2>&1 &
 		done
 		wait
 	fi
@@ -361,7 +372,7 @@ for n in $3;do
 #			$cpath/buildTestDataset.pl -F 4 -T $info $ppath/${mod}_${testrun} ${taxa[*]/%/.tab}
 #		fi
 		err_test $? $LINENO
-		$cpath/doSVM.pl $group $ppath/${mod}_test.dat $ppath/${mod}_IDs.dat $ppath/${mod}_${testrun}.tab $training $labels $spath/shogun
+		$cpath/doSVM.pl $group $ppath/${mod}_test.dat $ppath/${mod}_IDs.dat $ppath/${mod}_${testrun}.tab $training $labels $shogun
 		err_test $? $LINENO
 		$cpath/lineageResults.pl $info $group $ppath/${mod}_${testrun}.tab $ppath/$testrun $mod
 		err_test $? $LINENO
