@@ -1,13 +1,13 @@
 #!/bin/bash
-# LABEL - Lineage Assignment By Extended Learning - Version 0.4.6
+# LABEL - Lineage Assignment By Extended Learning - Version 0.5.0
 # Predicts the clade for a given nucleotide sequence & gene.
 
 # Copyright (C) 2012, Centers for Disease Control & Prevention
 # Author: Samuel S. Shepard (vfn4@cdc.gov)
 
 PROGRAM="LABEL"
-YEAR="2015"
-VERSION="v0.4.6"
+YEAR="2016"
+VERSION="v0.5.0"
 AUTHOR="Samuel S. Shepard"
 EMAIL="vfn4@cdc.gov"
 AFFIL="Centers for Disease Control & Prevention"
@@ -69,6 +69,16 @@ if [ "$bpath" == "" ]; then
 fi
 resources=LABEL_RES
 
+# OS and ARCH
+if [ -x "`which uname`" ];then
+	OS=`uname -s`
+	if [ "$(uname -m)" != "x86_64" -a "$OS" == "Linux" ];then
+		OS="Linux32"
+	fi
+else
+	OS="Linux"
+fi
+
 ## SHELL VARS ##
 LANG=POSIX
 shopt -u nocaseglob
@@ -93,7 +103,6 @@ function print_usage() {
 	echo -e "\t\t-W\tWeb-server mode: requires ABSOLUTE path to WRITABLE working directory."
 	echo -e "\t\t-O\tOutput directory path, do not use with web mode."
 	echo -e "\t\t-G\tCreate a scoring matrix using given header annotations for Graphing."
-	echo -e "\t\t-I\tInstall/link LABEL binaries for your system (FRESH INSTALL).\n"
 	echo -e "Example: $0 -C gisaid_H5N1.fa Bird_Flu H5\n"
 }
 
@@ -154,11 +163,6 @@ fi
 
 while getopts "IGP:E:TACRDSW:L:O:h" option;do
 	case $option in
-		I)
-		cd $bpath/$resources/scripts
-		./INSTALL.sh
-		exit 0
-		;;
 		G)
 		DO_GRAPH=1
 		;;
@@ -236,6 +240,14 @@ project=${args[$OPTIND]}
 module=${args[$OPTIND+1]}
 owd=`pwd`
 bin=$bpath/$resources/scripts
+hmmscore=$bin/hmmscore_$OS
+align2model=$bin/align2model_$OS
+muscle=$bin/muscle_$OS
+FastTreeMP=$bin/FastTreeMP_$OS
+modelfromalign=$bin/modelfromalign_$OS
+shogun=$bin/shogun_$OS
+
+
 if [ $DO_WEB -eq 0 ];then
 	tpath=$bpath/$resources/test_data
 fi
@@ -286,9 +298,9 @@ function scoreLineageSGE() {
 
 	cd $ppath
 	if [ -r $mpath/null.mod ];then
-		local cmd="$bin/hmmscore $run -db $db -modelfile $m -subtract_null 0 && $bin/parseScores.pl $ppath/$run.dist > $ppath/$run.tab"
+		local cmd="$hmmscore $run -db $db -modelfile $m -subtract_null 0 && $bin/parseScores.pl $ppath/$run.dist > $ppath/$run.tab"
 	else
-		local cmd="$bin/hmmscore $run -db $db -modelfile $m && $bin/parseScores.pl $ppath/$run.dist > $ppath/$run.tab"
+		local cmd="$hmmscore $run -db $db -modelfile $m && $bin/parseScores.pl $ppath/$run.dist > $ppath/$run.tab"
 	fi
 
 	qsub -N $name -cwd -b y -j y -o $name.o "$cmd" > /dev/null 2>&1
@@ -307,11 +319,11 @@ function scoreLineage() {
 	
 	cd $ppath
 	if [ -r $mpath/null.mod ];then
-		$bin/hmmscore $run -db $db -modelfile $m -subtract_null 0 >/dev/null 2>&1
+		$hmmscore $run -db $db -modelfile $m -subtract_null 0 >/dev/null 2>&1
 	elif [ "$(basename $ppath)" == "x-rev" ] || [ -d $ppath/x-rev ];then
-		$bin/hmmscore $run -db $db -modelfile $m -dpstyle 1 -subtract_null 1 >/dev/null 2>&1
+		$hmmscore $run -db $db -modelfile $m -dpstyle 1 -subtract_null 1 >/dev/null 2>&1
 	else
-		$bin/hmmscore $run -db $db -modelfile $m >/dev/null 2>&1
+		$hmmscore $run -db $db -modelfile $m >/dev/null 2>&1
 	fi
 	$bin/parseScores.pl $ppath/$run.dist > $ppath/$run.tab
 }
@@ -326,13 +338,13 @@ function doAlignment() {
 		if [ $USE_MAFFT -eq 1 ];then
 			$mafft --maxiterate 1000 --thread -1 $in > $out
 		else
-			$bin/muscle -in $in -out $out
+			$muscle -in $in -out $out
 		fi
 	else 
 		if [ $USE_MAFFT -eq 1 ];then
 			$mafft --maxiterate 1000 --thread -1 $in > $out 2> /dev/null
 		else
-			$bin/muscle -in $in -out $out >/dev/null 2>&1
+			$muscle -in $in -out $out >/dev/null 2>&1
 		fi
 	fi
 	rm $in
@@ -346,7 +358,7 @@ function doHMMalignment() {
 	local mod=$3
 	
 	cd $ppath/FASTA
-	$bin/align2model $out -db $in -modelfile $mod >/dev/null 2>&1
+	$align2model $out -db $in -modelfile $mod >/dev/null 2>&1
 	$bin/removeInsertionStates.pl $out.a2m > $out
 	rm $in $out.a2m
 }
@@ -406,16 +418,16 @@ function doAnalysis() {
 		if [ -r $mpath/null.mod ];then
 			echo "declare -a mods=($mpath/null.mod $mpath/*hmm.mod)" >> $ppath/$level.tmp.sh
 			echo 'run="`basename ${mods[$m]} .mod`_$l"' >> $ppath/$level.tmp.sh
-			echo "$bin/hmmscore "'$run -db $db -modelfile ${mods[$m]} -subtract_null 0' >> $ppath/$level.tmp.sh
+			echo "$hmmscore "'$run -db $db -modelfile ${mods[$m]} -subtract_null 0' >> $ppath/$level.tmp.sh
 		elif [ -d $mpath/x-rev ];then
 			echo "declare -a mods=($mpath/*hmm.mod $mpath/x-rev/*hmm.mod)" >> $ppath/$level.tmp.sh
 			echo 'pat=$(dirname ${mods[$m]});pat=$(basename $pat);[[ "$pat" == "x-rev" ]] && cd x-rev' >> $ppath/$level.tmp.sh
 			echo 'run="`basename ${mods[$m]} .mod`_$l"' >> $ppath/$level.tmp.sh
-			echo "$bin/hmmscore "'$run -db $db -modelfile ${mods[$m]} -dpstyle 1 -subtract_null 1' >> $ppath/$level.tmp.sh
+			echo "$hmmscore "'$run -db $db -modelfile ${mods[$m]} -dpstyle 1 -subtract_null 1' >> $ppath/$level.tmp.sh
 		else
 			echo "declare -a mods=($mpath/*hmm.mod)" >> $ppath/$level.tmp.sh
 			echo 'run="`basename ${mods[$m]} .mod`_$l"' >> $ppath/$level.tmp.sh
-			echo "$bin/hmmscore "'$run -db $db -modelfile ${mods[$m]}' >> $ppath/$level.tmp.sh
+			echo "$hmmscore "'$run -db $db -modelfile ${mods[$m]}' >> $ppath/$level.tmp.sh
 		fi
 		local a=`expr $g \* ${#mods[@]}`
 
@@ -504,7 +516,7 @@ function doAnalysis() {
 	[ -r "$tnpath/x-filter.txt" ]	&& fltrArg="-D $tnpath/x-filter.txt"
 	[ -d $ppath/x-rev ]		&& vitCRarg="-C $ppath/x-rev -F 3"
 
-	$bin/doLABELlevel.pl $ppath $tnpath $trnArg $fltrArg $nllArg $vitCRarg 2> $ppath/${project}.log
+	$bin/doLABELlevel.pl -S $shogun $ppath $tnpath $trnArg $fltrArg $nllArg $vitCRarg 2> $ppath/${project}.log
 	err_test $? $LINENO
 
 	check=`ls -d $mpath/c-* 2>/dev/null|wc -w`
@@ -576,7 +588,7 @@ if [ $DO_GRAPH -eq 1 ];then
 		rm $mpath/${project}_${level}.tmp
 		for f in $mpath/*;do
 			$bin/removeGapColumns.pl $f
-			$bin/modelfromalign ${module}_`basename $f .tmp`_hmm -alignfile $f -alphabet DNA 2>/dev/null
+			$modelfromalign ${module}_`basename $f .tmp`_hmm -alignfile $f -alphabet DNA 2>/dev/null
 		done
 		cd $ppath
 		modules=`ls $mpath/*mod`
@@ -674,14 +686,14 @@ if [ $DO_ALIGNMENT -eq 1 -a $DO_CONTROL -eq 1 ];then
 	$bin/sortByAnnotation.pl $ppath/FASTA/${project}_ordered.fasta > $ppath/FASTA/${project}_ordered.fasta2
 	mv $ppath/FASTA/${project}_ordered.fasta2 $ppath/FASTA/${project}_ordered.fasta
 	if [ $DO_WEB -eq 1 ];then
-		$bin/FastTreeMP -quiet -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${project}_ordered.fasta > $ppath/FASTA/${project}_tree.nwk 2>/dev/null
-		$bin/FastTreeMP -quiet -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${module}_control.fasta > $ppath/FASTA/${module}_control.nwk 2>/dev/null
+		$FastTreeMP -quiet -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${project}_ordered.fasta > $ppath/FASTA/${project}_tree.nwk 2>/dev/null
+		$FastTreeMP -quiet -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${module}_control.fasta > $ppath/FASTA/${module}_control.nwk 2>/dev/null
 	else
 		echo ""
 		echo "LABEL: Calculating maximum likelihood trees."
 		echo ""
-		$bin/FastTreeMP -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${project}_ordered.fasta > $ppath/FASTA/${project}_tree.nwk
-		$bin/FastTreeMP -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${module}_control.fasta > $ppath/FASTA/${module}_control.nwk
+		$FastTreeMP -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${project}_ordered.fasta > $ppath/FASTA/${project}_tree.nwk
+		$FastTreeMP -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${module}_control.fasta > $ppath/FASTA/${module}_control.nwk
 		echo ""
 	fi
 else
@@ -692,10 +704,10 @@ else
 		$bin/sortByAnnotation.pl $ppath/FASTA/${project}_ordered.fasta > $ppath/FASTA/${project}_ordered.fasta2
 		mv $ppath/FASTA/${project}_ordered.fasta2 $ppath/FASTA/${project}_ordered.fasta
 		if [ $DO_WEB -eq 1 ];then
-			$bin/FastTreeMP -quiet -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${project}_ordered.fasta > $ppath/FASTA/${project}_tree.nwk 2>/dev/null
+			$FastTreeMP -quiet -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${project}_ordered.fasta > $ppath/FASTA/${project}_tree.nwk 2>/dev/null
 		else
 			echo ""
-			$bin/FastTreeMP -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${project}_ordered.fasta > $ppath/FASTA/${project}_tree.nwk
+			$FastTreeMP -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${project}_ordered.fasta > $ppath/FASTA/${project}_tree.nwk
 			echo ""
 		fi
 	# DO CONTROL TREE/ALIGNMENT #
@@ -716,11 +728,11 @@ else
 		fi
 
 		if [ $DO_WEB -eq 1 ];then
-			$bin/FastTreeMP -quiet -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${module}_control.fasta > $ppath/FASTA/${module}_control.nwk 2>/dev/null
+			$FastTreeMP -quiet -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${module}_control.fasta > $ppath/FASTA/${module}_control.nwk 2>/dev/null
 		else
 			echo ""
 			echo "LABEL: Calculating maximum likelihood."
-			$bin/FastTreeMP -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${module}_control.fasta > $ppath/FASTA/${module}_control.nwk
+			$FastTreeMP -quote -nt -gtr -gamma -boot 1000 < $ppath/FASTA/${module}_control.fasta > $ppath/FASTA/${module}_control.nwk
 			echo ""
 		fi
 	fi

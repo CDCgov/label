@@ -1,4 +1,4 @@
-LABEL, Lineage Assignment by Extended Learning, version 0.3
+LABEL, Lineage Assignment by Extended Learning, version 0.4.6
 Sam Shepard (vfn4@cdc.gov), CDC/OID/NCIRD, 22 May 2012
 
 HARDWARE.
@@ -17,6 +17,5 @@ INSTALLATION.
 1) Unzip the archive containing LABEL.
 2) Move the file "LABEL" and the directory "LABEL_RES" to a place in your PATH environment variable.  Otherwise, add the directory containing LABEL and LABEL_RES to your PATH.
 3) Restart your terminal emulator. Note: LABEL_RES and LABEL must be in the same folder.
-4) In your terminal emulator, execute: LABEL -I
-5) LABEL is now installed.  To test it, execute: LABEL test.fa test_project H9v2011
-6) The file "test.fa" is given in the deployment archive. To access LABEL without using the PATH variable, cd to your extracted directory & substitute "./LABEL" for "LABEL" above.
+4) LABEL is now installed.  To test it, execute: LABEL test.fa test_project H9v2011
+5) The file "test.fa" is given in the deployment archive. To access LABEL without using the PATH variable, cd to your extracted directory & substitute "./LABEL" for "LABEL" above.
