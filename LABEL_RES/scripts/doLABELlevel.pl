@@ -35,22 +35,22 @@ GetOptions(
 		'label|L=s' => \$labelFile,
 		'training|T=s' => \$trainingFile,
 		'data-filter|D=s' => \$dataFilter,
-		'shogun-path|S' => \$shogunPath,
+		'shogun-path|S=s' => \$shogunPath,
 		'best-score|B' => \$bestScoreMode,
 		'custom-reverse|C=s' => \$custRevPath
 	  );
 
 if ( scalar(@ARGV) < 2 ) {
 	$message = "Usage:\n\tperl $0 <PPATH> <TNPATH> [FASTA ...] [OPTIONS]\n";
-	$message .= "\t\t--score-field|F <#>\tSpecified the scoring field to extract.\n";
-	$message .= "\t\t--group|G <STR>\t\tCurrent group.\n";
-	$message .= "\t\t--module|M <STR>\tModule (base) of the lineage assignment operation.\n";
-	$message .= "\t\t--label|L <FILE>\tFile for the training labels.\n";
-	$message .= "\t\t--training|T <FILE>\tFile for the training data.\n";
-	$message .= "\t\t--info|I <FILE>\t\tFile for the training information, including taxa.\n";
-	$message .= "\t\t--data-filter|D <FILE>\tFile for the data filter threshold (module-specific).\n";
-	$message .= "\t\t--shogun-path|S <PATH>\tPath to the shogun binary (OS-specific or linked).\n";
-	$message .= "\t\t--retrain|R\t\tSpecifies the classifier file does not exists.\n";
+	$message .= "\t\t-F|--score-field <#>\t\tSpecified the scoring field to extract.\n";
+	$message .= "\t\t-G|--group <STR>\t\tCurrent group.\n";
+	$message .= "\t\t-M|--module <STR>\t\tModule (base) of the lineage assignment operation.\n";
+	$message .= "\t\t-L|--label <FILE>\t\tFile for the training labels.\n";
+	$message .= "\t\t-T|--training <FILE>\t\tFile for the training data.\n";
+	$message .= "\t\t-I|--info <FILE>\t\tFile for the training information, including taxa.\n";
+	$message .= "\t\t-D|--data-filter <FILE>\t\tFile for the data filter threshold (module-specific).\n";
+	$message .= "\t\t-S|--shogun-path <PATH>\t\tPath to the shogun binary (OS-specific or linked).\n";
+	$message .= "\t\t-R|--retrain\t\t\tSpecifies the classifier file does not exists.\n";
 	$message .= "\t\t-C|--custom-reverse <path>\tUse custom reverse corrected viterbi model. Path contains equivalent pHMMs.\n";
 	die($message."\n");
 }

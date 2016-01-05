@@ -516,7 +516,7 @@ function doAnalysis() {
 	[ -r "$tnpath/x-filter.txt" ]	&& fltrArg="-D $tnpath/x-filter.txt"
 	[ -d $ppath/x-rev ]		&& vitCRarg="-C $ppath/x-rev -F 3"
 
-	$bin/doLABELlevel.pl -S $shogun $ppath $tnpath $trnArg $fltrArg $nllArg $vitCRarg 2> $ppath/${project}.log
+	$bin/doLABELlevel.pl $ppath $tnpath $trnArg $fltrArg $nllArg $vitCRarg -S $shogun 2> $ppath/${project}.log
 	err_test $? $LINENO
 
 	check=`ls -d $mpath/c-* 2>/dev/null|wc -w`
