@@ -7,7 +7,7 @@
 
 PROGRAM="LABEL"
 YEAR="2016"
-VERSION="v0.5.0"
+VERSION="v0.5.1"
 AUTHOR="Samuel S. Shepard"
 EMAIL="vfn4@cdc.gov"
 AFFIL="Centers for Disease Control & Prevention"
@@ -81,6 +81,7 @@ fi
 
 ## SHELL VARS ##
 LANG=POSIX
+TAB=$'\t'
 shopt -u nocaseglob
 shopt -u nocasematch
 ################
@@ -523,10 +524,10 @@ function doAnalysis() {
 	if [ $check -ne 0 -a $NO_RECURSION -eq 0 ];then 
 		for c in $mpath/c-*;do
 			c=`basename $c`
-			check=`cut -f2 $ppath/LEVEL_result.tab|grep "^$c$" -c`
+			check=`cut -f2 $ppath/LEVEL_result.tab|grep "^${c}$" -c`
 			if [ $check -ne "0" ];then
 				mkdir -p $ppath/$c
-				grep "\t$c$" $ppath/LEVEL_result.tab|$bin/fastaExtractor.pl $ppath/${project}_${level}.fas -F 1 > $ppath/$c/${project}_$c.fas
+				grep "${TAB}${c}$" $ppath/LEVEL_result.tab|$bin/fastaExtractor.pl $ppath/${project}_${level}.fas -F 1 > $ppath/$c/${project}_$c.fas
 
 				if [ "$grouping" == "$module" ];then 
 					doAnalysis $ppath/$c $mpath/$c $tnpath/$c $c $c&
