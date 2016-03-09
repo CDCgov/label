@@ -1,5 +1,5 @@
 #!/bin/bash
-# LABEL - Lineage Assignment By Extended Learning - Version 0.5.0
+# LABEL - Lineage Assignment By Extended Learning - Version 0.5.1
 # Predicts the clade for a given nucleotide sequence & gene.
 
 # Copyright (C) 2012, Centers for Disease Control & Prevention
@@ -523,10 +523,10 @@ function doAnalysis() {
 	if [ $check -ne 0 -a $NO_RECURSION -eq 0 ];then 
 		for c in $mpath/c-*;do
 			c=`basename $c`
-			check=`cut -f2 $ppath/LEVEL_result.tab|grep -P "^\Q$c\E$" -c`
+			check=`cut -f2 $ppath/LEVEL_result.tab|grep "^$c$" -c`
 			if [ $check -ne "0" ];then
 				mkdir -p $ppath/$c
-				grep -P "\t\Q$c\E$" $ppath/LEVEL_result.tab|$bin/fastaExtractor.pl $ppath/${project}_${level}.fas -F 1 > $ppath/$c/${project}_$c.fas
+				grep "\t$c$" $ppath/LEVEL_result.tab|$bin/fastaExtractor.pl $ppath/${project}_${level}.fas -F 1 > $ppath/$c/${project}_$c.fas
 
 				if [ "$grouping" == "$module" ];then 
 					doAnalysis $ppath/$c $mpath/$c $tnpath/$c $c $c&
