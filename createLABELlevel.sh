@@ -96,6 +96,9 @@ else
 fi
 
 # CLUSTERING options
+USE_QSUB=0
+USE_BSUB=0
+
 if ( hash qsub>/dev/null );then
 	USE_QSUB=1
 	USE_BSUB=0
