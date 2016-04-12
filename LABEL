@@ -2,7 +2,7 @@
 # LABEL - Lineage Assignment By Extended Learning - Version 0.5.1
 # Predicts the clade for a given nucleotide sequence & gene.
 
-# Copyright (C) 2016, Centers for Disease Control & Prevention
+# Affiliation: Centers for Disease Control & Prevention
 # Author: Samuel S. Shepard et al. (vfn4@cdc.gov)
 
 PROGRAM="LABEL"
@@ -90,7 +90,7 @@ shopt -u nocasematch
 
 # FNC - HELP #
 function print_usage() {
-	echo -e "\n$PROGRAM $VERSION Copyright (C) $YEAR\n$AUTHOR ($EMAIL), $AFFIL"
+	echo -e "\n$PROGRAM $VERSION, updated $YEAR\n$AUTHOR ($EMAIL), $AFFIL"
         echo -e "GPL version 3. This program comes with ABSOLUTELY NO WARRANTY. This is free software."
 	echo -e "You are welcome to redistribute it under certain conditions. See:  <http://www.gnu.org/licenses/>.\n\n"
 	echo -e "Usage:\n\t$(basename $PROGRAM) [-P MAX_PROC] [-E C_OPT] [-W WRK_PATH|-O OUT_PATH] [-G|-TACRD|-S] [-L LIN_PATH] <nts.fasta> <project> <Module:H5,H9,etc.>"
