@@ -1,5 +1,5 @@
-LABEL, Lineage Assignment by Extended Learning, version 0.4.6
-Sam Shepard (vfn4@cdc.gov), CDC/OID/NCIRD, 22 May 2012
+LABEL, Lineage Assignment by Extended Learning, version 0.5.1
+Sam Shepard (vfn4@cdc.gov), CDC/OID/NCIRD, 12 April 2016
 
 HARDWARE.
 We recommend a single multi-core machine with no fewer than 2 cores (8 to 12 cores work best) and at least 4 GB of RAM.  LABEL runtime is impacted by the number of cores available on a machine. Use with Mac OS X requires a 64 bit chipset.

@@ -2,8 +2,8 @@
 # LABEL - Lineage Assignment By Extended Learning - Version 0.5.1
 # Predicts the clade for a given nucleotide sequence & gene.
 
-# Copyright (C) 2012, Centers for Disease Control & Prevention
-# Author: Samuel S. Shepard (vfn4@cdc.gov)
+# Copyright (C) 2016, Centers for Disease Control & Prevention
+# Author: Samuel S. Shepard et al. (vfn4@cdc.gov)
 
 PROGRAM="LABEL"
 YEAR="2016"
