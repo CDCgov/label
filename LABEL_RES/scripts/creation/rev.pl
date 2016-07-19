@@ -21,10 +21,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use Getopt::Long;
-GetOptions(	'fastQ|Q'=> \$fastQ, 'reverse-only|R' => \$reverseOnly );
+GetOptions(	'fastQ|Q'=> \$fastQ, 'reverse-only|R' => \$reverseOnly, 'single-line-mode|L' => \$singleLine );
 
 if ( scalar(@ARGV) != 1 ) {
-	die("Usage:\n\tperl $0 <input.fasta> [-Q] [-R]\n");
+	die("Usage:\n\tperl $0 <input.fasta> [-Q] [-R] [-L]\n");
 }
 
 if ( defined($reverseOnly) ) {
@@ -33,13 +33,24 @@ if ( defined($reverseOnly) ) {
 	$takeComplement = 1;
 }
 
-open(IN, '<', $ARGV[0] ) or die("Cannot open $ARGV[0].\n");
+
+if ( $singleLine ) {
+	$sequence = $ARGV[0];
+	$sequence = reverse( $sequence );
+	if ( $takeComplement ) {
+		$sequence =~ tr/gcatrykmbvdhuGCATRYKMBVDHU/cgtayrmkvbhdaCGTAYRMKVBHDA/;
+	}
+	print $sequence,"\n";
+	exit;
+}
+
 if ( $fastQ ) {
 	$/ = "\n";
 } else {
 	$/ = ">";
 }
-while( $record = <IN> ) {
+
+while( $record = <> ) {
 	chomp($record);
 	if ( $fastQ ) {
 		$header = $record;
@@ -69,4 +80,3 @@ while( $record = <IN> ) {
 		print '>',$header,"\n",$sequence,"\n";
 	}
 }
-close(IN);

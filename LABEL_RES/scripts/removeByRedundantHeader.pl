@@ -26,27 +26,13 @@ GetOptions(
 		'underline-spaces|U'=>\$underline
 		);
 
-# ISSUES found with piping on some systems
-#if ( not -t STDIN ) {
-#	$handle = 'STDIN';
-#	if ( scalar(@ARGV) == 1 && !$include ) {
-#		$include = $ARGV[0];
-#	}
-#} els
-if ( scalar(@ARGV) != 1 ) {
+if ( -t STDIN and not @ARGV ) {
 	die("Usage:\n\tperl $0 <file.fa> [-U]\n");
-} else {
-	open(IN, '<', $ARGV[0]) or die("$0 ERROR: Cannot open $ARGV[0].\n");
-	$handle = 'IN';
 }
-
-#if ( scalar(@ARGV) == 0 ) {
-#
-#}
 
 # PROCESS fasta data
 $/ = ">"; %headers = ();
-while( $record = <$handle> ) {
+while( $record = <> ) {
 	chomp($record);
 	@lines = split(/\n/, $record);
 	$header = shift(@lines);
@@ -59,7 +45,6 @@ while( $record = <$handle> ) {
 		$headers{$header} = $sequence;
 	}
 }
-close($handle);
 
 # OUTPUT non-redundant from the hash
 foreach $header ( keys(%headers) ) {

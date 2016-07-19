@@ -6,7 +6,7 @@
 # TURN ON or OFF analysis mode ##########
 analysis_mode=0	#   record into file	#
 P=8		#   parallel procs	#
-doAppend=0	#   whether to spike	#
+doAppend=1	#   whether to spike	#
 X=10		#   spike every X	#
 staticAppend=1  #   static appendix	#
 #########################################
