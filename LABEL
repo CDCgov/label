@@ -1,5 +1,5 @@
 #!/bin/bash
-# LABEL - Lineage Assignment By Extended Learning - Version 0.5.1
+# LABEL - Lineage Assignment By Extended Learning
 # Predicts the clade for a given nucleotide sequence & gene.
 
 # Affiliation: Centers for Disease Control & Prevention
