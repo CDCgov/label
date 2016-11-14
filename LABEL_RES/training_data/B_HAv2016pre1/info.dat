@@ -1,0 +1,27 @@
+-1	c-vic1A-vic1B-vicOld
+1	c-yam3-yam2-yamOld
+
+1	1|DISC_2012787240_219279_v1|B/Phuket/86/2012|Byam|Y3{c-yam3-yam2-yamOld}
+2	1|DISC_2012787658_219457_v1|B/Florida/10/2012|Bvic|V1A{c-vic1A-vic1B-vicOld}
+3	1|DISC_2012825012_222916_v1|B/Vietnam/61/2012|Bvic|V1A{c-vic1A-vic1B-vicOld}
+4	1|DISC_2013758706_232321_v1|B/NongKhai/03/2013|Byam|Y2{c-yam3-yam2-yamOld}
+5	1|DISC_2013762867_237103_v1|B/NewHampshire/04/2013|Byam|Y2{c-yam3-yam2-yamOld}
+6	1|DISC_3000412920_273340_v1|B/Mexico/1273/2015|Byam|Y3{c-yam3-yam2-yamOld}
+7	1|EPI244685|B/Stockholm/6/2009|Victoria|{c-vic1A-vic1B-vicOld}
+8	1|EPI370315|B/PHILIPPINES/3701/2011|Victoria|{c-vic1A-vic1B-vicOld}
+9	1|EPI370731|B/Laos/I1000/2011|Victoria|{c-vic1A-vic1B-vicOld}
+10	1|EPI439038|B/ISHIKAWA/44/2013|Yamagata|{c-yam3-yam2-yamOld}
+11	1|EPI445937|B/England/226/2013|Victoria|{c-vic1A-vic1B-vicOld}
+12	1|EPI445973|B/Ukraine/5621/2012|Yamagata|{c-yam3-yam2-yamOld}
+13	1|EPI534628|B/EHIME/13/2013|Yamagata|{c-yam3-yam2-yamOld}
+14	1|EPI574752|B/Egypt/4223/2014|Yamagata|{c-yam3-yam2-yamOld}
+15	1|EPI574820|B/Madagascar/2439/2014|Yamagata|{c-yam3-yam2-yamOld}
+16	1|EPI636525|B/SouthAustralia/49/2015|Victoria|{c-vic1A-vic1B-vicOld}
+17	1|EPI704162|B/Sydney/53/2015|Yamagata|{c-yam3-yam2-yamOld}
+18	1|EPI758833|B/Cyprus/F84/2016|Victoria|{c-vic1A-vic1B-vicOld}
+19	1|cds_AGX17433|B/Brisbane/72/2002||{c-vic1A-vic1B-vicOld}
+20	1|cds_AGX18335|B/Brisbane/90/2005||{c-vic1A-vic1B-vicOld}
+21	1|cds_AJK05049|B/ChongqingYuzhong/1316/2010||{c-vic1A-vic1B-vicOld}
+22	1|cds_AKA54648|B/Texas/3900/2014||{c-vic1A-vic1B-vicOld}
+23	1|cds_AML42300|B/Singapore/En428/2013||{c-yam3-yam2-yamOld}
+24	1|cds_AML43530|B/Singapore/En170/2014||{c-yam3-yam2-yamOld}

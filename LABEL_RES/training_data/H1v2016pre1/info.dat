@@ -1,0 +1,23 @@
+-1	c-6C-6B-6B1-6B2
+1	c-8-7-6-5-Old
+
+1	1|110542|A/Yokohama/90/2015|{c-6B-6B1-6B2}{c-6C-6B-6B1-6B2}
+2	1|18265|A/Guatemala/04/2010|{c-1-8-Old}{c-8-7-6-5-Old}
+3	1|EPI223146|A/Sweden/14/2009|{c-1-8-Old}{c-8-7-6-5-Old}
+4	1|EPI243988|A/Macedonia/26/2010|{c-1-8-Old}{c-8-7-6-5-Old}
+5	1|EPI276585|A/ENG/888/2009|{c-1-8-Old}{c-8-7-6-5-Old}
+6	1|EPI418830|A/Stockholm/50/2012|{c-1-8-Old}{c-8-7-6-5-Old}
+7	1|EPI425997|A/Navarra/111/2013|{6C}{c-6C-6B-6B1-6B2}
+8	1|EPI438465|A/Uppsala/3/2013|{7}{c-8-7-6-5-Old}
+9	1|EPI491217|A/VICTORIA/804/2013|{c-6B-6B1-6B2}{c-6C-6B-6B1-6B2}
+10	1|EPI500727|A/Portugal/52/2009|{c-1-8-Old}{c-8-7-6-5-Old}
+11	1|EPI722819|A/Singapore/TT481/2015|{c-6B-6B1-6B2}{c-6C-6B-6B1-6B2}
+12	1|R_A/Bangladesh/3505/2015_Apr_C1/C1_4_|_2015NH_H1N1_swl_group_6B|{c-6B-6B1-6B2}{c-6C-6B-6B1-6B2}
+13	1|R_A/Connecticut/08/2013_Nov_C2_4_|_2013SH_H1N1_swl_group_6B|{c-6B-6B1-6B2}{c-6C-6B-6B1-6B2}
+14	1|R_A/Jeonbuk/1998/2014_Dec_C2/C1_4_|_2014SH_H1N1_swl_group_6B|{c-6B-6B1-6B2}{c-6C-6B-6B1-6B2}
+15	1|cds_ADT91182|A/BandarAbbas/5096/2010|{c-1-8-Old}{c-8-7-6-5-Old}
+16	1|cds_AFM78666|A/swine/Illinois/A01134723/2011|{C-6A-6_6like}{c-8-7-6-5-Old}
+17	1|cds_AHE37983|A/Guam/3432/2013|{6C}{c-6C-6B-6B1-6B2}
+18	1|cds_AHV83776|A/California/3535/2013|{c-6B-6B1-6B2}{c-6C-6B-6B1-6B2}
+19	1|cds_AIE53489|A/Santiago/p15d1/2011|{7}{c-8-7-6-5-Old}
+20	1|cds_AKA63660|A/Thailand/CU-B9024/2014|{c-6B-6B1-6B2}{c-6C-6B-6B1-6B2}
