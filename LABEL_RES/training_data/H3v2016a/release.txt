@@ -1,0 +1,10 @@
+H3v2016R3
+Ujwal Bagal with Sam Shepard
+2017-02-27
+
+This is a training update with:
+- An additional 414 3C.2a viruses
+- An additional 485 3C.2a1 viruses
+- Anomalous 3C.2a viruses (similar to A/Hawaii/01/2017) correctly annotated
+- H3v2016R3/c-3C/c-3C.2/c-3C.2x removed
+- H3v2016R3/c-3C/c-3C.2 now contains 3C.2a, 3C.2b, & 3C.2a1
