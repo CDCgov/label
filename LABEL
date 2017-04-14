@@ -418,7 +418,7 @@ EOL
 	$bin/interleavedSamples.pl -X tmpp -G $groups $ppath/${project}_${level}.fas $ppath/leaf > /dev/null 2>&1
 	if [ "$doGrid" -eq "1" ];then
 		# specifying -q all.q may be very important to the success of this call
-		qsub -t 1-$partitions:1 -N "N${project}-${level}" -sync y -j y -o $script.o $script.sh > /dev/null 2>&1
+		qsub $IRMA_QUEUE -t 1-$partitions:1 -N "N${project}-${level}" -sync y -j y -o $script.o $script.sh > /dev/null 2>&1
 		if [ "$?" -ne "0" ];then
 			(( $DO_WEB )) || echo -e "\n\nWARNING: qsub of '$project-$level' failed. Switching to master node.\n\n"
 			$PARALLEL --workdir $ppath -j $LOCAL_PROC $script.sh {} ::: $(seq $partitions) > /dev/null 2>&1
