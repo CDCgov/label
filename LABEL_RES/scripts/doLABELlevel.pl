@@ -383,7 +383,15 @@ sub sgn($) {
 	} elsif ( $a < 0 ) {
 		return -1;
 	} else {
-		return 0;
+		$a = substr($a,0,1);
+		if ( $a eq '-' ) {
+			return -1;
+		} elsif ( $a =~ /\d/ ) {
+			return 1;
+		} else {
+			print STDERR "$0 WARNING: unexpected shogun return class.";
+			return 0;
+		}
 	}
 }
 
