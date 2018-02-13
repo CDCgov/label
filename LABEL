@@ -6,8 +6,8 @@
 # Author: Samuel S. Shepard et al. (vfn4@cdc.gov)
 
 PROGRAM="LABEL"
-YEAR="2016"
-VERSION="v0.5.3"
+YEAR="2018"
+VERSION="v0.5.4"
 AUTHOR="Samuel S. Shepard"
 EMAIL="vfn4@cdc.gov"
 AFFIL="Centers for Disease Control & Prevention"
@@ -152,6 +152,7 @@ LINEAGE_PATH=""
 OUTPUT_DIR=`pwd`
 USE_SGE=0	# use SGE loosely
 CLUSTER_OPT=0	# clustering option
+BASH=bash
 
 mafft=mafft
 if command -v $mafft >/dev/null 2>&1; then
@@ -421,12 +422,12 @@ EOL
 		qsub $IRMA_QUEUE -t 1-$partitions:1 -N "N${project}-${level}" -sync y -j y -o ${script}.o ${script}.sh > /dev/null 2>&1
 		if [ "$?" -ne "0" ];then
 			(( $DO_WEB )) || echo -e "\n\nWARNING: qsub of '$project-$level' failed. Switching to master node.\n\n"
-			$PARALLEL --workdir $ppath -j $LOCAL_PROC $script.sh {} ::: $(seq $partitions) > /dev/null 2>&1
+			$PARALLEL --workdir $ppath -j $LOCAL_PROC $BASH ${script}.sh {} ::: $(seq $partitions) > /dev/null 2>&1
 		else
 			rm ${script}.o
 		fi
 	else
-		$PARALLEL --workdir $ppath -j $LOCAL_PROC $script.sh {} ::: $(seq $partitions) > /dev/null 2>&1
+		$PARALLEL --workdir $ppath -j $LOCAL_PROC $BASH ${script}.sh {} ::: $(seq $partitions) > /dev/null 2>&1
 	fi
 	(( $DO_WEB )) || echo -n '...'
 
