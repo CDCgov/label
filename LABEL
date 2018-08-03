@@ -139,7 +139,7 @@ function err_test() {
 # FNC - CHECK PROGRAM #
 # Idea courtesy: stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
 function check_prgm() {
-	command -v $1 >/dev/null 2>&1 || { echo "$PROGRAM ERROR: Program '$1' not found, please check your PATH or install it." >&2; exit 1; }
+	command -v $1 >/dev/null 2>&1 || die "Program '$1' not found, please check your PATH or install it."
 }
 
 # Check for programs
@@ -204,8 +204,7 @@ while getopts "IGP:E:TACRDSW:L:O:h" option;do
 		DO_OUT=1
 		OUTPUT_DIR=$OPTARG
 		if [ ! -w "$OUTPUT_DIR" ];then
-			echoerr "`basename $0` ERROR: output directory '$OUTPUT_DIR' not writable."
-			exit 1
+			die "output directory '$OUTPUT_DIR' not writable."
 		fi
 		;;
 		S)
@@ -219,8 +218,7 @@ while getopts "IGP:E:TACRDSW:L:O:h" option;do
 		DO_WEB=1
 		tpath=$OPTARG
 		if [ ! -w "$tpath" ];then
-			echoerr "`basename $0` ERROR: output directory '$tpath' not writable."
-			exit 1
+			die "output directory '$tpath' not writable."
 		fi
 		;;
 		h)
