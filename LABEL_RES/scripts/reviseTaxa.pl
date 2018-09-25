@@ -32,6 +32,7 @@ GetOptions(
 		'delete-prev|D' => \$deletePrev,
 		'delete-single|S'=> \$deleteSingle,
 		'add-annot|A=s' => \$addAnnot,
+		'add-replace|L=s' => \$addReplace,
 		'fuzzy-match|Z' => \$fuzzyMatch,
 		'order-mode|O:s' => \$orderMode,
 		'match-files|M' => \$matchFiles,
@@ -64,6 +65,7 @@ if ( defined($orderMode) ) {
 	open(ORD, '>', $orderMode ) or die("$0 ERROR: Cannot open $orderMode.\n");
 }
 
+if ( $addReplace ) { $addAnnot = $addReplace; }
 if ( $addAnnot ) {
 	open(ANNOT,'<', $addAnnot ) or die("$0 ERROR: Cannot open $addAnnot.\n");
 	%annotMap = (); $/ = "\n";
@@ -100,7 +102,13 @@ foreach $record ( @records ) {
 	# Add annotations from a file
 	if ( $addAnnot ) {
 		if ( $newID = headerInDB(\%annotMap,\@annotIDs,uc($id)) ) {
-			$id = $id.'{'.$annotMap{uc($newID)}.'}';
+			$newID = $annotMap{uc($newID)};
+			if ( $addReplace && $id =~ m/{([^{}]*)}\s*$/ ) {
+				$id =~ s/{([^{}]*)}\s*$/{$newID}/;
+
+			} else {
+				$id = $id."{$newID}";
+			}
 		}
 	}
 	
