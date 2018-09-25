@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# reviseTaxa -  Version 1.0
+# reviseTaxa -  Version 1.1
 # Allows taxa annotation manipulations for fasta files.
 #
 # Copyright (C) 2012, Centers for Disease Control & Prevention
@@ -152,7 +152,7 @@ foreach $record ( @records ) {
 	# Check for prefix or suffix
 	if ( (defined($prefix) || defined($suffix)) && !$matchFiles ) {
 		if ( defined($prevInfix) ) {
-			$id =~ s/{(.+?)}{/{$prefix$1$suffix}{/;
+			$id =~ s/{(.+?)}\{/{$prefix$1$suffix}{/;
 		} else {
 			$id =~ s/{(.+?)}/{$prefix$1$suffix}/;
 		}
