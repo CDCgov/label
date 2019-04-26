@@ -1,0 +1,14 @@
+H1pdm09v2019R1 (aka R4 by Ujwal) based on H1pdm09v2018R3, H1pdm09R2-v2017
+Ujwal Bagal with Sam Shepard. 
+
+v2019R1
+- Added a split for 6B.1 and 6B.1A
+
+Previous.
+- Added 4,585 de-duplicated new sequences from PubSeq and verified clades using Catherine's analysis and a new phylogenetic tree (generally confirming her result)
+- Corrected some of the sequences she had highlighted [Yucatan; Iran(Tehran) S8465; Ghana 2015]
+- Added a filter to reject non-H1pdm09 lineage H1s as much as possible
+- Clades 6A, 6B, 6B1 and 6B2 classify 100% on the new dataset
+- Addressed and improved accuracy at various levels while keeping the annotation tree intact
+- Confirmed there were some older clades issues, partially due to a dearth of discriminating sites (star topology for an unrooted tree)
+- Changed the name of 6B1 to 6B.1; 6B2 to 6B.2; and 6-6like to 6 to better match what has been done historically in DISC.
