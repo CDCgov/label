@@ -26,7 +26,9 @@ GetOptions(	'groups|G=i'=> \$numberGroups,
 		'fastQ|Q' => \$fastQ,
 		'by-read-pairs|P' => \$byReadPairs,
 		'read-zipped|Z' => \$readZipped,
-       		'extension|X:s' => \$extension	);
+		'underscore-header|U' => \$underscoreHeader,
+       		'extension|X:s' => \$extension	
+);
 
 if (  scalar(@ARGV) < 2 ) {
 	$message = "\n$0 <input.fasta> <out_prefix> [-G <#groups>|-F <denom-fraction>] [OPTIONS]\n";
@@ -159,6 +161,7 @@ if ( $fastQ ) {
 		chomp($record);
 		@lines = split(/\r\n|\n|\r/, $record);
 		$header = shift(@lines);
+		if ( defined($underscoreHeader) ) { $header =~ tr/ /_/; }
 		$sequence = lc(join('',@lines));
 
 		$length = length($sequence);
