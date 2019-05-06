@@ -205,7 +205,7 @@ if [ "$use_xrev" -eq "1" ];then
 		f2=$tpath/x-rev/$(basename $f .fasta).rev.fasta
 		$cpath/rev.pl -R $f > $f2
 		m=`basename $f .fasta`_hmm
-		taxa=(${taxa[*]} $m)
+		#taxa=(${taxa[*]} $m)
 		$spath/removeGapColumns.pl $f2
 		$modelfromalign $m -alignfile $f2 -alphabet DNA 2> /dev/null 
 		rm $m.weightoutput
