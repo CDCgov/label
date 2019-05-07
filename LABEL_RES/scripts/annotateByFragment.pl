@@ -27,7 +27,7 @@ use strict; use warnings;
 
 my $message;
 if ( scalar(@ARGV) != 2 ) {
-	$message = "\nUsage:\n\tperl $0 <input_fasta> <patterns>\n";
+	$message = "\nUsage:\n\tperl $0 <input_fasta> <hash_file>\n";
 	die($message."\n");
 }
 
@@ -64,7 +64,8 @@ my $hash = '';
 my $found = 0;
 my @fragment_lengths = sort { $b <=> $a } keys(%fragments);
 
-open(OUT,'>',$ARGV[1]) or die("Cannot open $ARGV[1] for writing.\n");
+#open(OUT,'>',$ARGV[0]) or die("Cannot open $ARGV[0] for writing.\n");
+my $fragment = '';
 foreach my $record ( @records ) {
 	@lines = split(/\r\n|\n|\r/, $record);
 	$header = shift(@lines);
@@ -79,7 +80,8 @@ foreach my $record ( @records ) {
 		foreach my $L ( @fragment_lengths ) {
 			if ( $L <= $length ) {
 				foreach my $p ( 0..($length-$L) ) {
-					$hash = sha1_hex(substr($sequence,$p,$L));
+					$fragment = substr($seq2,$p,$L);
+					$hash = sha1_hex($fragment);
 					if ( defined($fragments{$L}{$hash}) ) {
 						print STDOUT $header,"\t",$fragments{$L}{$hash},"\t",$hash,"\n";
 						last;
@@ -91,7 +93,8 @@ foreach my $record ( @records ) {
 	}
 
 	if ( !$found ) {
-		print OUT '>',$header,"\n",$sequence,"\n";
+		print '';
+		#print OUT '>',$header,"\n",$sequence,"\n";
 	}
 }
-close(OUT);
+#close(OUT);
