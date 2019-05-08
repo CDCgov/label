@@ -6,9 +6,10 @@
 # TURN ON or OFF analysis mode ##########
 analysis_mode=0	#   record into file	#
 P=8		#   parallel procs	#
-doAppend=1	#   whether to spike	#
+doAppend=0	#   whether to spike	#
 X=10		#   spike every X	#
 staticAppend=1  #   static appendix	#
+doHMM=1		#   generate HMMs	#
 #########################################
 #########################################
 
@@ -75,14 +76,20 @@ fi
 ppath=$(cd $(dirname $1) && pwd -P)
 mod=$2
 reps=$4
+
 alvl_file=$ppath/$(basename $1)
+alvl_hmm_file=$alvl_file
+if [ -r "$ppath/$(basename $1 .fasta).hmm.fasta" ];then
+	alvl_hmm_file="$ppath/$(basename $1 .fasta).hmm.fasta"
+	echo -e "Using $alvl_hmm_file for HMMs but $alvl_file for the SVM."
+fi
+
+
 qscript=$ppath/level.tmp.sh
 appendix=$ppath/${testrun}_appendix.txt
 cd $ppath
 
-
 [ -r "$appendix" -a "$staticAppend" -eq "0" ] && rm $appendix
-
 if [ $# -eq 5 ];then 
 	linpath=/$mod/$5
 	tpath=$tnpath/$mod/$5
@@ -124,7 +131,7 @@ function doCleanUp() {
 	fi
 	[ -r "$ppath/${testrun}_false.tmp" ]	&& rm $ppath/${testrun}_false.tmp
 	rm $ppath/${mod}_K*dat 2> /dev/null
-	rm $tpath/*fasta 
+	rm $tpath/*fasta 2> /dev/null
 	rm $ppath/${mod}_IDs.dat $ppath/${mod}_${testrun}.tab $ppath/${mod}_${testrun}.tab.tmp
 	rm $ppath/${testrun}_result.txt $ppath/${testrun}_result.tab 2> /dev/null
 	rm ${taxa[*]/%/.dist} null.dist 2> /dev/null
@@ -154,64 +161,70 @@ fi
 
 # Create HMMs
 banlist=$ppath/level_banlist.txt
-if [ -r $banlist ]; then
-	$spath/fastaExtractor.pl -R -A $alvl_file $banlist > $alvl_file.tmp.fasta
-	$spath/removeGapColumns.pl $alvl_file.tmp.fasta
-	$spath/partitionTaxa.pl $alvl_file.tmp.fasta $tpath
-	rm $alvl_file.tmp.fasta
-else
-	$spath/removeGapColumns.pl $alvl_file
-	$spath/partitionTaxa.pl $alvl_file $tpath
-fi
-
-
 use_xrev=0
-rm $tpath/*_hmm.mod 2> /dev/null
-size=$(grep '>' $alvl_file -c)
-if [ -r null.fasta ];then 
-	$modelfromalign null -alignfile $ppath/null.fasta -alphabet DNA 2> /dev/null 
-	rm $ppath/null.weightoutput
-	mv $ppath/null.mod $tpath
-	echo "$SELF: using custom null model"
-else
-	if [ -r "$tpath/null.mod" ];then
-		rm $tpath/null.mod
-	fi
-
-	if [ -d $ppath/x-rev -o -d $mpath/x-rev ];then
-		use_xrev=1
-		[ ! -d $ppath/x-rev ] && mkdir $ppath/x-rev
-		[ ! -d $mpath/x-rev ] && mkdir $mpath/x-rev
-		echo "$SELF: using viterbi custom reverse corrected null model."
+if [ "$doHMM" -eq "1" ];then
+	if [ -r $banlist ]; then
+		$spath/fastaExtractor.pl -R -A $alvl_hmm_file $banlist > $alvl_file.tmp.fasta
+		$spath/removeGapColumns.pl $alvl_file.tmp.fasta
+		$spath/partitionTaxa.pl $alvl_file.tmp.fasta $tpath
+	#	rm $alvl_file.tmp.fasta
 	else
-		echo "$SELF: using reverse corrected null model."
+		$spath/removeGapColumns.pl $alvl_hmm_file
+		$spath/partitionTaxa.pl $alvl_hmm_file $tpath
 	fi
-fi
 
-echo "$SELF: generating pHMMs"
-for f in $tpath/*fasta;do
-	m=`basename $f .fasta`_hmm
-	taxa=(${taxa[*]} $m)
-	$spath/removeGapColumns.pl $f
-	$modelfromalign $m -alignfile $f -alphabet DNA 2> /dev/null 
-	rm $m.weightoutput
-	mv $m.mod $tpath
-done
+	rm $tpath/*_hmm.mod 2> /dev/null
+	size=$(grep '>' $alvl_file -c)
+	if [ -r null.fasta ];then 
+		$modelfromalign null -alignfile $ppath/null.fasta -alphabet DNA 2> /dev/null 
+		rm $ppath/null.weightoutput
+		mv $ppath/null.mod $tpath
+		echo "$SELF: using custom null model"
+	else
+		if [ -r "$tpath/null.mod" ];then
+			rm $tpath/null.mod
+		fi
 
-if [ "$use_xrev" -eq "1" ];then
-	echo "$SELF: generating reverse pHMMs"
-	cd x-rev
+		if [ -d $ppath/x-rev -o -d $mpath/x-rev ];then
+			use_xrev=1
+			[ ! -d $ppath/x-rev ] && mkdir $ppath/x-rev
+			[ ! -d $mpath/x-rev ] && mkdir $mpath/x-rev
+			echo "$SELF: using viterbi custom reverse corrected null model."
+		else
+			echo "$SELF: using reverse corrected null model."
+		fi
+	fi
+
+	echo "$SELF: generating pHMMs"
 	for f in $tpath/*fasta;do
-		f2=$tpath/x-rev/$(basename $f .fasta).rev.fasta
-		$cpath/rev.pl -R $f > $f2
 		m=`basename $f .fasta`_hmm
-		#taxa=(${taxa[*]} $m)
-		$spath/removeGapColumns.pl $f2
-		$modelfromalign $m -alignfile $f2 -alphabet DNA 2> /dev/null 
+		taxa=(${taxa[*]} $m)
+		$spath/removeGapColumns.pl $f
+		$modelfromalign $m -alignfile $f -alphabet DNA 2> /dev/null 
 		rm $m.weightoutput
-		mv $m.mod $tpath/x-rev
+		mv $m.mod $tpath
 	done
-	cd -
+
+	if [ "$use_xrev" -eq "1" ];then
+		echo "$SELF: generating reverse pHMMs"
+		cd x-rev
+		for f in $tpath/*fasta;do
+			f2=$tpath/x-rev/$(basename $f .fasta).rev.fasta
+			$cpath/rev.pl -R $f > $f2
+			m=`basename $f .fasta`_hmm
+			#taxa=(${taxa[*]} $m)
+			$spath/removeGapColumns.pl $f2
+			$modelfromalign $m -alignfile $f2 -alphabet DNA 2> /dev/null 
+			rm $m.weightoutput
+			mv $m.mod $tpath/x-rev
+		done
+		cd -
+	fi
+else
+	for f in $tpath/*mod;do
+		m=$(basename $f .mod)
+		taxa=(${taxa[*]} $m)
+	done
 fi
 
 # Optimize training set
