@@ -219,7 +219,7 @@ while getopts "IGP:E:TACRDSW:L:O:h" option;do
 		DO_WEB=1
 		tpath=$OPTARG
 		if [ ! -w "$tpath" ];then
-			die "output directory '"$tpath"' not writable."
+			die "output directory '$tpath' not writable."
 		fi
 		;;
 		h)
