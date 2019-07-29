@@ -24,6 +24,7 @@
 use File::Basename;
 use Getopt::Long;
 use Cwd 'abs_path';
+use File::Copy;
 
 GetOptions(
 		'retrain|R' => \$retrain,
@@ -37,7 +38,8 @@ GetOptions(
 		'data-filter|D=s' => \$dataFilter,
 		'shogun-path|S=s' => \$shogunPath,
 		'best-score|B' => \$bestScoreMode,
-		'custom-reverse|C=s' => \$custRevPath
+		'custom-reverse|C=s' => \$custRevPath,
+		'local|Q' => \$local
 	  );
 
 if ( scalar(@ARGV) < 2 ) {
@@ -100,6 +102,11 @@ if ( !defined($labelFile) ) {
 	$labelFile = $tpath.'/labels.dat';
 }
 
+if ( !defined($classifier) ) {
+	$classifier = $tpath.'/classifier.dat';
+}
+
+$local = defined($local) ? 1 : 0;
 
 open( IN, '<', $labelFile ) or die("Cannot open training labels file ($labelFile).\n");
 $line = <IN>; close(IN); chomp($line);
@@ -174,7 +181,7 @@ for($i = 0;$i < scalar(@lines); $i++ ) {
 $numLabels = $i;
 
 if ( $numClasses != $numLabels ) {
-	die("$PROGRAM ERROR: Number classes ($numClasses) in $tpath/labels.dat different ($numLabels) from in .../info.dat).\n");
+	die("$PROGRAM ERROR: Number classes ($numClasses) in $labelFile different ($numLabels) from in .../info.dat).\n");
 }
 
 if ( defined($custRevPath) ) {
@@ -251,6 +258,14 @@ for( $i = 0; $i < $Ni; $i++ ) {
 }
 close(DAT); 
 
+if ( $local ) {
+	copy($trainingFile,"$ppath/training.dat") or die "Copy failed: $!";
+	copy($labelFile,"$ppath/labels.dat") or die "Copy failed: $!";
+	copy($classifier,"$ppath/classifier.dat") or die "Copy failed: $!";
+	$trainingFile = 'training.dat';
+	$labelFile = 'labels.dat';
+	$classifier = 'classifier.dat';
+}
 
 if ( ! $bestScoreMode ) {
 	# TYPE of kernel
@@ -270,7 +285,6 @@ if ( ! $bestScoreMode ) {
 	$sg .=	"new_classifier $svm_type\n";
 
 	# BRANCH for re-training
-	$classifier = "$tpath/classifier.dat";
 	if ( defined($retrain) ) {
 		$sg .=	"train_classifier\n";
 		$sg .=	"save_classifier $classifier\n";
@@ -279,17 +293,22 @@ if ( ! $bestScoreMode ) {
 	}
 
 	# FINISH and execute shogun script
-	$sg .=	"set_features TEST $ppath/test.dat\n";
-	$testResults = "$ppath/test_results.dat.tmp";
-	$sg .=	"$testResults = classify\n";
-	$out = `echo "$sg" | $shogunPath`;
-
+	$testResults = "test_results.dat.tmp";
+	if ( $local ) {
+		$sg .=	"set_features TEST test.dat\n";
+		$sg .=	"$testResults = classify\n";
+		$sg .=  "! pwd";
+		$out = `cd "$ppath" && echo "$sg" | "$shogunPath"`;
+	} else {
+		$sg .=	"set_features TEST $ppath/test.dat\n";
+		$sg .=	"$ppath/$testResults = classify\n";
+		$out = `echo "$sg" | "$shogunPath"`;
+	}
 
 	# READ shogun results.
-	open(IN, '<', $testResults) or die("$0 ERROR: result file $testResults was not written by SHOGUN.\n");
 	$/ = "\n";
-	$line = <IN>;
-	chomp($line);
+	open(IN, '<', "$ppath/$testResults") or die("$0 ERROR: result file \"$ppath/$testResults\" was not written by SHOGUN.\n");
+	$line = <IN>; chomp($line);
 	@results = split(/ /, $line);
 	close(IN);
 
@@ -299,11 +318,9 @@ if ( ! $bestScoreMode ) {
 	}
 }
 
-
 open( TXT, '>', $ppath.'/LEVEL_result.txt' ) or die("$PROGRAM ERROR: Cannot open LEVEL_result.txt\n");
 open( TAB, '>', $ppath.'/LEVEL_result.tab' ) or die("$PROGRAM ERROR: Cannot open LEVEL_result.tab\n");
 open( TRACE, '>', $ppath.'/LEVEL_trace.tab' ) or die("$PROGRAM ERROR: Cannot open LEVEL_trace.tab\n");
-
 
 # OUTPUT the results
 %lineagesByID = ();
@@ -321,7 +338,7 @@ for($i=0; $i < $Ni;$i++ ) {
 		$annot = 'UNKNOWN';
 	}
 
-	if ( $numClasses > 2 ) {	
+	if ( $numClasses > 2 ) {
 		$pred = $taxaByLabels{int($results[$i])};
 	} else {
 		$pred = $taxaByLabels{sgn($results[$i])};
