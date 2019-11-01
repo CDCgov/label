@@ -7,7 +7,7 @@
 
 PROGRAM="LABEL"
 YEAR="2019"
-VERSION="v0.6.0"
+VERSION="v0.6.1"
 AUTHOR="Samuel S. Shepard"
 EMAIL="vfn4@cdc.gov"
 AFFIL="Centers for Disease Control & Prevention"

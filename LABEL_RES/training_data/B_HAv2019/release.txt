@@ -1,0 +1,15 @@
+2019-11-01
+B_HA v2019R1
+Sam Shepard
+
+Re-trained c-V1A to revise V1A and V1A.1 and add V1A.2 and V1A.3. 
+
+2019-10-28
+Converted V1A1 to V1A.1
+
+2017-04-05
+B_HA v2017R1 a.k.a. v2016R4
+Ujwal Bagal with Sam Shepard
+
+This update added clade V1A1 which has a deletion versus Brisbane60 mature HA @162-163.
+
