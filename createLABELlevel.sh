@@ -10,6 +10,7 @@ doAppend=0	#   whether to spike	#
 X=10		#   spike every X	#
 staticAppend=1  #   static appendix	#
 doHMM=1		#   generate HMMs	#
+rmGAP=1		#   remove Gap columns	#
 #########################################
 #########################################
 
@@ -165,11 +166,11 @@ use_xrev=0
 if [ "$doHMM" -eq "1" ];then
 	if [ -r $banlist ]; then
 		$spath/fastaExtractor.pl -R -A $alvl_hmm_file $banlist > $alvl_file.tmp.fasta
-		$spath/removeGapColumns.pl $alvl_file.tmp.fasta
+		[ "$rmGAP" -eq "1" ] && $spath/removeGapColumns.pl $alvl_file.tmp.fasta
 		$spath/partitionTaxa.pl $alvl_file.tmp.fasta $tpath
 	#	rm $alvl_file.tmp.fasta
 	else
-		$spath/removeGapColumns.pl $alvl_hmm_file
+		[ "$rmGAP" -eq "1" ] && $spath/removeGapColumns.pl $alvl_hmm_file
 		$spath/partitionTaxa.pl $alvl_hmm_file $tpath
 	fi
 
@@ -199,7 +200,7 @@ if [ "$doHMM" -eq "1" ];then
 	for f in $tpath/*fasta;do
 		m=`basename $f .fasta`_hmm
 		taxa=(${taxa[*]} $m)
-		$spath/removeGapColumns.pl $f
+		[ "$rmGAP" -eq "1" ] && $spath/removeGapColumns.pl $f
 		$modelfromalign $m -alignfile $f -alphabet DNA 2> /dev/null 
 		rm $m.weightoutput
 		mv $m.mod $tpath
@@ -213,7 +214,7 @@ if [ "$doHMM" -eq "1" ];then
 			$cpath/rev.pl -R $f > $f2
 			m=`basename $f .fasta`_hmm
 			#taxa=(${taxa[*]} $m)
-			$spath/removeGapColumns.pl $f2
+			[ "$rmGAP" -eq "1" ] && $spath/removeGapColumns.pl $f2
 			$modelfromalign $m -alignfile $f2 -alphabet DNA 2> /dev/null 
 			rm $m.weightoutput
 			mv $m.mod $tpath/x-rev
@@ -372,6 +373,8 @@ else
 	size=$(wc -l < ${mod}_IDs.dat)
 	echo "$SELF: test data already found"
 fi
+
+echo -e "ID\tMod\tT-Size\tRep\tTP\tTotal\tLin path" > $ppath/${mod}_SV.txt
 echo -e "Mod\tT-Size\tRep\tTP\tTotal\tLin path"
 for n in $3;do 
 	for r in $($enum $reps);do
@@ -379,7 +382,7 @@ for n in $3;do
 		labels=$ppath/${mod}_K${n}-${r}_labels.dat
 		training=$ppath/${mod}_K${n}-${r}_training.dat
 		myLog=$ppath/${mod}.log
-		
+
 		$cpath/randomTrainingSet.pl $table . -S $n -D -P ${mod}_K${n}-${r} -A $appendix
 		err_test $? $LINENO
 #		if [ -r $tpath/null.mod ];then 
@@ -394,13 +397,17 @@ for n in $3;do
 		err_test $? $LINENO
 		correct=$($spath/evaluateResults.pl -T -H -S $ppath/${testrun}_result.txt)
 		err_test $? $LINENO
+
+		$cpath/parseInfo.pl $info $mod $n $r $correct $size $linpath >> $ppath/${mod}_SV.txt
+		err_test $? $LINENO
+
 		echo -e "$mod\t$n\t$r\t$correct\t$size\t$linpath"
 		if [ "$takeLog" -eq "1" ];then
 			echo -e "$mod\t$n\t$r\t$correct\t$size\t$linpath" >> $myLog
 			$spath/evaluateResults.pl -H $ppath/${testrun}_result.txt >> $myLog
 		fi
 
-		[ "$analysis_mode" -eq "1" ] && echo -e "$mod\t$n\t$r\t$correct\t$size\t$linpath" >> ${mod}_SV.txt
+		[ "$analysis_mode" -eq "1" ] && echo -e "$mod\t$n\t$r\t$correct\t$size\t$linpath"
 		[ -z "$correct" ] && echo "$SELF ERROR: could not train or test module." && exit 1
 		$spath/evaluateResults.pl -J $ppath/${testrun}_result.tab >> $ppath/${testrun}_false.tmp
 		modulo=$(($r%$X))
