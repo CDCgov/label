@@ -1,0 +1,24 @@
+H3v2019R1 aka H3v2019
+Sam Shepard
+- moved c-3C/c-3C.2/c-3C.2ab to c-3C/c-3C.2 (tests on GAA and R4 dataset were accurate in the expected clade scope)
+- created c-3C/c-3C.2/c-3C.2a with 3C.2a clades: 2a2, 2a3, 2a4 and 2a1/2a1b/2a1a (accurate except for transitional sequence "aeda0ded11291d4b135835327cf011076f0e9d24", see stub3r1)
+- created c-3C/c-3C.2/c-3C.2a/c-3C.2a1/c-3C.2a1a that discriminates 3C.2a1b and other 3C.2a1 viruses (no issues found, see stub6r1)
+- created c-3C/c-3C.2/c-3C.2a/c-3C.2a1/c-3C.2a1a that discriminates 3C.2a1a and 3C.2a1 (no issues found, see stub6r1)
+
+
+H3v2016R4 aka H3v2016b
+Ujwal Bagal with Sam Shepard
+
+v2016b, 20170612
+- In response to 3025630157_ZZYPOTJ9_v1, fixed 3C.2b & 3C.2a calling
+- c-3C/c-3C.2 now has only 3C.2a1 & c-3C.2ab
+- c-3C/c-3C.2ab has 3C.2a and 3C.2b 
+	+ uses similar 3C.2a subset for comparison to 3C.2b (when 2up, visually separated), otherwise they are non-separable
+	+ adds extreme sample N_3000096085|A/Michigan/19/2015|{3C.2a} for SVM training (banlist) not HMM training
+
+v2016a, 20170227
+- An additional 414 3C.2a viruses
+- An additional 485 3C.2a1 viruses
+- Anomalous 3C.2a viruses (similar to A/Hawaii/01/2017) correctly annotated
+- H3v2016R3/c-3C/c-3C.2/c-3C.2x removed
+- H3v2016R3/c-3C/c-3C.2 now contains 3C.2a, 3C.2b, & 3C.2a1
