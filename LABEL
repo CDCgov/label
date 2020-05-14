@@ -6,8 +6,8 @@
 # Author: Samuel S. Shepard et al. (vfn4@cdc.gov)
 
 PROGRAM="LABEL"
-YEAR="2019"
-VERSION="v0.6.1"
+YEAR="2020"
+VERSION="v0.6.2"
 AUTHOR="Samuel S. Shepard"
 EMAIL="vfn4@cdc.gov"
 AFFIL="Centers for Disease Control & Prevention"
@@ -142,13 +142,6 @@ function check_prgm() {
 	command -v "$1" >/dev/null 2>&1 || die "Program '$1' not found, please check your PATH or install it."
 }
 
-# Check for programs
-check_prgm zip
-check_prgm cut
-check_prgm paste
-check_prgm perl
-check_prgm /usr/bin/env
-
 # PROCESS BASH OPTIONS #
 LOCAL_PROC=16	# MAX CONCURRENT PARALLEL 
 GRID_PROC=128	# MAX CONCURRENT GRID PROCESSORS
@@ -165,6 +158,12 @@ OUTPUT_DIR=`pwd`
 USE_SGE=0	# use SGE loosely
 CLUSTER_OPT=0	# clustering option
 BASH=bash
+
+# Check for programs
+check_prgm cut
+check_prgm paste
+check_prgm perl
+check_prgm /usr/bin/env
 
 mafft=mafft
 if command -v "$mafft" >/dev/null 2>&1; then
@@ -263,12 +262,10 @@ PARALLEL="$bin/parallel"
 
 if [ "$DO_WEB" -eq "0" ];then
 	tpath="$bpath"/$resources/test_data
-fi
-
-if [ "$DO_WEB" -eq "1" ];then
-	ppath="$tpath"/${project}
-else
 	ppath="$bpath"/$resources/test_data/${project}
+	check_prgm zip
+else
+	ppath="$tpath"/${project}
 fi
 
 [ -d "$ppath" ] && die "Project currently in use. See: '$ppath'" || mkdir -p "$ppath"
@@ -610,7 +607,7 @@ fi
 if [ "$IS_PIPE" -eq "1" ];then
 	cat "$ppath"/${project}_final.tab	
 	rm -rf "$ppath" &
-elif [ $DO_WEB -eq 1 ]; then
+elif [ "${DO_WEB:-0}" -eq 1 ]; then
 	echo "$ppath"
 else 
 	cd "$tpath"
