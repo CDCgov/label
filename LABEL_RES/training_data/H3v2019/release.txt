@@ -1,3 +1,7 @@
+H3v2019R2 aka H3v2019
+Sam Shepard (2021-01-08)
+- Relaxed filter from -1.206 to -1.000 to better accomodate for existing seasonal variability
+
 H3v2019R1 aka H3v2019
 Sam Shepard
 - moved c-3C/c-3C.2/c-3C.2ab to c-3C/c-3C.2 (tests on GAA and R4 dataset were accurate in the expected clade scope)
