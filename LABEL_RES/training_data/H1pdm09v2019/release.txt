@@ -1,6 +1,11 @@
 H1pdm09v2019R1 (aka R4 by Ujwal) based on H1pdm09v2018R3, H1pdm09R2-v2017
 Ujwal Bagal with Sam Shepard. 
 
+
+v2019R1x2 (2021-11-03, SSS)
+- Relaxed x-filter at base from -1.210 to -1.00
+- Added x-filter to c-otherwise at -1.210 while c-6B remains filtered by base (more specific)
+
 v2019R1
 - Added a split for 6B.1 and 6B.1A
 

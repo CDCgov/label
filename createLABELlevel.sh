@@ -35,6 +35,18 @@ function err_test() {
 	fi
 }
 
+function warn() {
+	local t=$(date +"%Y-%m-%d %k:%M:%S")
+	echo -e "[$t] $SELF WARNING :: $1" 1>&2
+	return 1
+}
+
+function die() {
+	local t=$(date +"%Y-%m-%d %k:%M:%S")
+	echo -e "[$t] $SELF ERROR :: $1" 1>&2
+	exit 1
+}
+
 function check_prgm() {
 	if ( ! hash $1>dev/null );then
 		echo "$SELF ERROR: Program '$1' not found, please check your PATH or install it."
@@ -164,29 +176,33 @@ fi
 banlist=$ppath/level_banlist.txt
 use_xrev=0
 if [ "$doHMM" -eq "1" ];then
-	if [ -r $banlist ]; then
-		$spath/fastaExtractor.pl -R -A $alvl_hmm_file $banlist > $alvl_file.tmp.fasta
-		[ "$rmGAP" -eq "1" ] && $spath/removeGapColumns.pl $alvl_file.tmp.fasta
-		$spath/partitionTaxa.pl $alvl_file.tmp.fasta $tpath
+	if [ -r "$banlist" ]; then
+		"$spath"/fastaExtractor.pl -R -A $alvl_hmm_file $banlist > $alvl_file.tmp.fasta \
+		    && [ "$rmGAP" -eq "1" ] && $spath/removeGapColumns.pl $alvl_file.tmp.fasta \
+            || die "Extraction and/or gap removal failed."
+		"$spath"/partitionTaxa.pl $alvl_file.tmp.fasta $tpath \
+            || die "Partioning by taxa failed."
 	#	rm $alvl_file.tmp.fasta
 	else
-		[ "$rmGAP" -eq "1" ] && $spath/removeGapColumns.pl $alvl_hmm_file
-		$spath/partitionTaxa.pl $alvl_hmm_file $tpath
+		[ "$rmGAP" -eq "1" ] && $spath/removeGapColumns.pl $alvl_hmm_file \
+		    && "$spath"/partitionTaxa.pl $alvl_hmm_file $tpath \
+            || die "Gap removal and/or partitioning failed."
 	fi
 
 	rm $tpath/*_hmm.mod 2> /dev/null
 	size=$(grep '>' $alvl_file -c)
-	if [ -r null.fasta ];then 
-		$modelfromalign null -alignfile $ppath/null.fasta -alphabet DNA 2> /dev/null 
-		rm $ppath/null.weightoutput
-		mv $ppath/null.mod $tpath
+	if [ -r "null.fasta" ];then 
+		$modelfromalign null -alignfile $ppath/null.fasta -alphabet DNA 2> /dev/null \
+		    && rm $ppath/null.weightoutput \
+		    && mv $ppath/null.mod $tpath \
+            || die "ModelfromAlign failed for custom null"
 		echo "$SELF: using custom null model"
 	else
 		if [ -r "$tpath/null.mod" ];then
-			rm $tpath/null.mod
+			rm "$tpath"/null.mod
 		fi
 
-		if [ -d $ppath/x-rev -o -d $mpath/x-rev ];then
+		if [ -d "$ppath/x-rev" -o -d "$mpath/x-rev" ];then
 			use_xrev=1
 			[ ! -d $ppath/x-rev ] && mkdir $ppath/x-rev
 			[ ! -d $mpath/x-rev ] && mkdir $mpath/x-rev
@@ -197,14 +213,20 @@ if [ "$doHMM" -eq "1" ];then
 	fi
 
 	echo "$SELF: generating pHMMs"
-	for f in $tpath/*fasta;do
-		m=`basename $f .fasta`_hmm
-		taxa=(${taxa[*]} $m)
-		[ "$rmGAP" -eq "1" ] && $spath/removeGapColumns.pl $f
-		$modelfromalign $m -alignfile $f -alphabet DNA 2> /dev/null 
-		rm $m.weightoutput
-		mv $m.mod $tpath
-	done
+    if test -n "$(shopt -s nullglob;echo "$tpath"/*fasta)";then
+        for f in $tpath/*fasta;do
+            m=`basename $f .fasta`_hmm
+            taxa=(${taxa[*]} $m)
+            [ "$rmGAP" -eq "1" ] && $spath/removeGapColumns.pl $f
+            $modelfromalign $m -alignfile $f -alphabet DNA 2> /dev/null \
+                && rm $m.weightoutput \
+                && mv $m.mod $tpath \
+                || die "ModelfromAlign failed for '$f'"
+        done
+    else
+        ls "$tpath"
+        die "A 'level.fasta' is expected but found the above."
+    fi
 
 	if [ "$use_xrev" -eq "1" ];then
 		echo "$SELF: generating reverse pHMMs"
