@@ -112,7 +112,7 @@ if ( $fastQ ) {
 	$/ = "\n"; 
 	if ( $byReadPairs ) {
 		%indexByMolID = ();
-		$REgetMolID = qr/@(.+?)[_ ][123]:.+/;
+		$REgetMolID = qr/@(.+?)[_ \/][123](:.+)?/;
 		while($hdr=<IN>) {
 			$seq=<IN>;
 			$junk=<IN>;
@@ -128,7 +128,7 @@ if ( $fastQ ) {
 					$count[$index]++;
 				}
 			} else {
-				die("Irregular header for fastQ read pairs.\n");
+				die("Irregular header for fastQ read pairs:\n\t$hdr.\n");
 			}
 						
 			if ( !$fraction ) {
