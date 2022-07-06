@@ -1,32 +1,51 @@
 #!/usr/bin/env perl
-# Samuel Shepard - 9.2014
-# Take interleaved sampling throughout a FASTA file.
 #
-# Copyright (C) 2012, Centers for Disease Control & Prevention
-# Author: Samuel S. Shepard (vfn4@cdc.gov)
+# Description: 		Interleaved sampling of a FASTA file.
 #
-# GPL version 3
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Date dedicated: 	2022-07-06
+# Author: 			Samuel S. Shepard, Centers for Disease Control and Prevention
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Citation:         Shepard SS, Davis CT, Bahl J, Rivailler P, York IA, Donis
+#                   RO. LABEL: fast and accurate lineage assignment with
+#                   assessment of H5N1 and H9N2 influenza A hemagglutinins. PLoS
+#                   One. 2014;9(1):e86921. Published 2014 Jan 23.
+#                   doi:10.1371/journal.pone.0086921
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# =============================================================================
+#
+#                            PUBLIC DOMAIN NOTICE
+#        
+#  This source code file or script constitutes a work of the United States
+#  Government and is not subject to domestic copyright protection under 17 USC §
+#  105. This file is in the public domain within the United States, and
+#  copyright and related rights in the work worldwide are waived through the CC0
+#  1.0 Universal public domain dedication:
+#  https://creativecommons.org/publicdomain/zero/1.0/
+#   
+#  The material embodied in this software is provided to you "as-is" and without
+#  warranty of any kind, express, implied or otherwise, including without
+#  limitation, any warranty of fitness for a particular purpose. In no event
+#  shall the Centers for Disease Control and Prevention (CDC) or the United
+#  States (U.S.) government be liable to you or anyone else for any direct,
+#  special, incidental, indirect or consequential damages of any kind, or any
+#  damages whatsoever, including without limitation, loss of profit, loss of
+#  use, savings or revenue, or the claims of third parties, whether or not CDC
+#  or the U.S. government has been advised of the possibility of such loss,
+#  however caused and on any theory of liability, arising out of or in
+#  connection with the possession, use or performance of this software.
+#
+#  Please cite the manuscript  or author in any work or product based on this
+#  material.
+
 
 use File::Basename;
 use Getopt::Long;
 GetOptions(	'groups|G=i'=> \$numberGroups,
-		'fraction|F=i' => \$fraction,
-		'fastQ|Q' => \$fastQ,
-		'by-read-pairs|P' => \$byReadPairs,
-		'read-zipped|Z' => \$readZipped,
-		'underscore-header|U' => \$underscoreHeader,
+		    'fraction|F=i' => \$fraction,
+		    'fastQ|Q' => \$fastQ,
+		    'by-read-pairs|P' => \$byReadPairs,
+		    'read-zipped|Z' => \$readZipped,
+		    'underscore-header|U' => \$underscoreHeader,
        		'extension|X:s' => \$extension	
 );
 
@@ -54,9 +73,9 @@ if ( defined($fraction) && defined($numberGroups) ) {
 } elsif ( defined($numberGroups) ) {
 	if ( $numberGroups < 1 ) {
 		die("ERROR: The number of groups must be more than zero.\n");
-	} elsif( $numberGroups > 999 ) {
-		print STDERR "$PROGRAM WARNING: groups currently capped to 200.\n";
-		$numberGroups = 999;
+	} elsif( $numberGroups > 9999 ) {
+		print STDERR "$PROGRAM WARNING: groups currently capped to 9999.\n";
+		$numberGroups = 9999;
 	}
 	$fraction = 0;
 } else {
