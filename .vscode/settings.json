@@ -1,0 +1,12 @@
+{
+    "perltidy-more.autoDisable": true,
+    "perltidy-more.profile": ".../.perltidyrc",
+    "perl-toolbox.lint.severity": "cruel",
+    "perl-toolbox.lint.brutal": "hint",
+    "perl-toolbox.lint.excludedPolicies": [
+        "ValuesAndExpressions::ProhibitMagicNumbers",
+        "InputOutput::RequireBriefOpen",
+        "Modules::ProhibitExcessMainComplexity",
+        "Modules::RequireVersionVar"
+    ]
+}
