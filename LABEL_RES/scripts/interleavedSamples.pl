@@ -43,7 +43,8 @@ use English qw(-no_match_vars);
 use File::Basename;
 use Getopt::Long;
 
-my ( $numberGroups, $fraction, $fastQ, $byReadPairs, $readZipped, $underscoreHeader, $extension );
+my ( $numberGroups, $fraction, $extension );
+my ( $byReadPairs, $readZipped, $underscoreHeader, $fastQ ) = ( 0, 0, 0, 0 );
 GetOptions(
             'groups|G=i'          => \$numberGroups,
             'fraction|F=i'        => \$fraction,
@@ -54,7 +55,7 @@ GetOptions(
             'extension|X:s'       => \$extension
 );
 
-if ( scalar(@ARGV) < 2 ) {
+if ( scalar @ARGV < 2 ) {
     die(   "\n$PROGRAM_NAME <input.fasta> <out_prefix> [-G <#groups>|-F <denom-fraction>] [OPTIONS]\n"
          . "\t-F|--fraction POSITIVE_NUMBER\t\tFraction of dataset, using denominator D: 1/D.\n"
          . "\t-G|--groups POSITIVE_NUMBER\t\tNumber of datasets required.\n"

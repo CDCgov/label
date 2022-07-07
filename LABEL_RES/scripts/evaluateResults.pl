@@ -78,7 +78,7 @@ if ( defined $pathList ) {
     local $RS = "\n";
     while ( my $line = <PL> ) {
         chomp($line);
-        my @pieces = split( '/', $line );
+        my @pieces = split( q{/}, $line );
         my $annot  = pop(@pieces);
         my $junk   = shift(@pieces);
         if ( scalar @pieces > 1 ) {
@@ -116,7 +116,7 @@ while ( my $line = <$IN> ) {
     my $pred = trim( $fields[1] );
     my $anno = 'unknown';
 
-    if ( $fields[0] =~ /{([^{}]*)}\s*$/sxm ) {
+    if ( $fields[0] =~ /{([^{}]*)}\s*$/smx ) {
         $anno = $1;
     }
 

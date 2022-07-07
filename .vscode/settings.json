@@ -7,6 +7,8 @@
         "ValuesAndExpressions::ProhibitMagicNumbers",
         "InputOutput::RequireBriefOpen",
         "Modules::ProhibitExcessMainComplexity",
-        "Modules::RequireVersionVar"
+        "Modules::RequireVersionVar",
+        "ControlStructures::ProhibitDeepNests",
+        "BuiltinFunctions::ProhibitStringySplit"
     ]
 }
