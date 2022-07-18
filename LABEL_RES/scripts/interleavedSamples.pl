@@ -196,16 +196,15 @@ if ($fastQ) {
     my $fasta_record;
     while ( $fasta_record = <$IN> ) {
         chomp($fasta_record);
-        my @lines  = split( /\r\n|\n|\r/smx, $fasta_record );
-        my $header = shift(@lines);
-        if ( defined $underscoreHeader ) { $header =~ tr/ /_/; }
+        my @lines    = split( /\r\n|\n|\r/smx, $fasta_record );
+        my $header   = shift(@lines);
         my $sequence = lc( join( q{}, @lines ) );
 
-        my $length = length($sequence);
-        if ( $length == 0 ) {
+        if ( length($sequence) == 0 ) {
             next;
         }
 
+        if ( defined $underscoreHeader ) { $header =~ tr/ /_/; }
         my $index = $id % $numberGroups;
         $id++;
         $count[$index]++;
