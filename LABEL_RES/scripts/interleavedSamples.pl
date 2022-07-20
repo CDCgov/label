@@ -208,11 +208,11 @@ if ($fastQ) {
         my $index = $id % $numberGroups;
         $id++;
         $count[$index]++;
-        if ($fraction) {
-            print $fraction_handle '>', $header, "\n", $sequence, "\n";
-        } elsif ( $index == 0 ) {
+        if ( !$fraction ) {
             my $handle = $handles[$index];
             print $handle '>', $header, "\n", $sequence, "\n";
+        } elsif ( $index == 0 ) {
+            print $fraction_handle '>', $header, "\n", $sequence, "\n";
         }
     }
 }
