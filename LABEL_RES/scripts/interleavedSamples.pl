@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 #
-# Description: 		Interleaved sampling of a FASTA file.
+# Description:      Interleaved sampling of a FASTA file.
 #
-# Date dedicated: 	2022-07-06
-# Author: 			Samuel S. Shepard, Centers for Disease Control and Prevention
+# Date dedicated:   2022-07-06
+# Author:           Samuel S. Shepard, Centers for Disease Control and Prevention
 #
 # Citation:         Shepard SS, Davis CT, Bahl J, Rivailler P, York IA, Donis
 #                   RO. LABEL: fast and accurate lineage assignment with
