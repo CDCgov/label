@@ -41,18 +41,22 @@ use warnings;
 use strict;
 use English qw(-no_match_vars);
 use File::Basename;
-use Getopt::Long;
+use Getopt::Long qw(:config no_auto_abbrev);
+use Carp qw(croak);
 
 my ( $numberGroups, $fraction, $extension );
-my ( $byReadPairs, $readZipped, $underscoreHeader, $fastQ ) = ( 0, 0, 0, 0 );
+my ( $byReadPairs, $readZipped, $underscoreHeader, $fastQ, $removeEmptyFiles ) = ( 0, 0, 0, 0, 0 );
+
 GetOptions(
-            'groups|G=i'          => \$numberGroups,
-            'fraction|F=i'        => \$fraction,
-            'fastQ|Q'             => \$fastQ,
-            'by-read-pairs|P'     => \$byReadPairs,
-            'read-zipped|Z'       => \$readZipped,
-            'underscore-header|U' => \$underscoreHeader,
-            'extension|X:s'       => \$extension
+    'groups|G=i'           => \$numberGroups,
+    'fraction|F=i'         => \$fraction,
+    'fastQ|Q'              => \$fastQ,
+    'by-read-pairs|P'      => \$byReadPairs,
+    'read-zipped|Z'        => \$readZipped,
+    'underscore-header|U'  => \$underscoreHeader,
+    'extension|X:s'        => \$extension,
+    'remove-empty-files|R' => \$removeEmptyFiles
+
 );
 
 if ( scalar @ARGV < 2 ) {
@@ -62,6 +66,7 @@ if ( scalar @ARGV < 2 ) {
          . "\t-X|--extension\t\t\t\tExtension for output samplings.\n"
          . "\t-Q|--fastQ\t\t\t\tFastQ format for input and output.\n"
          . "\t-P|--by-read-pairs\t\t\tFastQ format for IN/OUT, interleave by read molecular ID (implies -Q).\n"
+         . "\t-R|--remove-empty-files\t\t\tDeletes files at the end if no data was written.\n"
          . "\n" );
 }
 
@@ -143,8 +148,7 @@ if ($fastQ) {
     if ($byReadPairs) {
         my %indexByMolID = ();
         my $REgetMolID   = qr/@(.+?)[_ ][123]:.+/smx;
-        my $hdr          = q{};
-        while ( $hdr = <$IN> ) {
+        while ( my $hdr = <$IN> ) {
             my $seq     = <$IN>;
             my $junk    = <$IN>;
             my $quality = <$IN>;
@@ -173,8 +177,7 @@ if ($fastQ) {
             }
         }
     } else {
-        my $hdr;
-        while ( $hdr = <$IN> ) {
+        while ( my $hdr = <$IN> ) {
             my $seq     = <$IN>;
             my $junk    = <$IN>;
             my $quality = <$IN>;
@@ -193,8 +196,7 @@ if ($fastQ) {
     }
 } else {
     local $RS = ">";
-    my $fasta_record;
-    while ( $fasta_record = <$IN> ) {
+    while ( my $fasta_record = <$IN> ) {
         chomp($fasta_record);
         my @lines    = split( /\r\n|\n|\r/smx, $fasta_record );
         my $header   = shift(@lines);
@@ -232,6 +234,10 @@ if ($fraction) {
     print STDOUT '----------------------------------------------------', "\n";
     for my $i ( 0 .. $numberGroups - 1 ) {
         printf( "%6d\t%5d\t%s\n", $id, $count[$i], $files[$i] );
+        if ( defined $removeEmptyFiles && $count[$i] == 0 ) {
+            unlink( $files[$i] );
+        }
+
     }
     print STDOUT '----------------------------------------------------', "\n";
 }
