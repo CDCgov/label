@@ -515,7 +515,7 @@ if [ $DO_WEB -eq 0 ];then
 fi
 cd "$owd"
 (( $DO_WEB )) || cp "$ppath"/${project}_final.txt "$OUTPUT_DIR"
-cp "$bpath"/$resources/README.md "$ppath"
+cp "$bpath"/README.md "$ppath"
 (( $DO_WEB )) || "$bin"/evaluateResults.pl -H -S "$ppath"/${project}_final.txt >&2
 
 if [ $NO_DELETE -eq 0 ];then
