@@ -6,8 +6,8 @@
 # Author: Samuel S. Shepard et al. (vfn4@cdc.gov)
 
 PROGRAM="LABEL"
-YEAR="2021"
-VERSION="v0.6.3"
+YEAR="2022"
+VERSION="v0.6.4"
 AUTHOR="Samuel S. Shepard"
 EMAIL="vfn4@cdc.gov"
 AFFIL="Centers for Disease Control & Prevention"
