@@ -2,7 +2,7 @@
 
 *By: Sam Shepard (vfn4@cdc.gov), CDC/NCIRD*
 
-LABEL’s purpose is to quickly, automatically, and correctly assign clades or lineages to nucleotide sequences.  Automated lineage assignment has applications in surveillance, research, and high-throughput database annotation.  Currently LABEL supports the lineage assignment of hemagglutinins for influenza A subtypes H5N1 and H9N2.
+LABEL’s purpose is to quickly, automatically, and correctly assign clades or lineages to nucleotide sequences.  Automated lineage assignment has applications in surveillance, research, and high-throughput database annotation.  Currently LABEL supports the lineage assignment of hemagglutinins for influenza A subtypes H5N1 and H9N2. Additional information is on the [LABEL website](https://wonder.cdc.gov/amd/flu/irma/).
 
 ## METHOD
 
