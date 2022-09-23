@@ -196,8 +196,12 @@ if ( defined($terse) ) {
     print STDOUT sprintf( "%10s\t%5s\t%5s\t%6s\n", 'CLADE', 'TP', 'Num', '%Acc' );
     print STDOUT '--------------------------------------', "\n";
     foreach my $anno ( sort { $a cmp $b } keys(%annots) ) {
-        print sprintf( "%10s\t%5d\t%5d\t%5.1f%%\n",
-                       $anno, $corByAnno{$anno}, $annots{$anno}, ( 100 * $corByAnno{$anno} / $annots{$anno} ) );
+        if ( defined $corByAnno{$anno} ) {
+            print sprintf( "%10s\t%5d\t%5d\t%5.1f%%\n",
+                           $anno, $corByAnno{$anno}, $annots{$anno}, ( 100 * $corByAnno{$anno} / $annots{$anno} ) );
+        } else {
+            print sprintf( "%10s\t%5d\t%5d\t%5.1f%%\n", $anno, 0, $annots{$anno}, 0 );
+        }
     }
     print STDOUT '--------------------------------------', "\n";
     print STDOUT sprintf( "%10s\t%5d\t%5d\t%5.1f%%\n", 'TOTAL', $correct, $total, ( 100 * $correct / $total ) );
