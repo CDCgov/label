@@ -1,4 +1,4 @@
-﻿# LABEL, Lineage Assignment by Extended Learning
+# LABEL, Lineage Assignment by Extended Learning
 
 *By: Sam Shepard (vfn4@cdc.gov), CDC/NCIRD*
 
@@ -110,8 +110,13 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU General Public License along with this program.  If not, see [*www.gnu.org/licenses/*](http://www.gnu.org/licenses/).
 
-## DICLAIMER & LIMITATION OF LIABILITY
+### Additional limitations or flexibilities:
+- [SAM (align2model,hmmscore,modelfromalign)](http://compbio.soe.ucsc.edu/sam2src/) binaries may be used within LABEL for government and/or academic use only. Commercial use and redistribution for commercial use is excluded. Use of SAM implies this [license](http://compbio.soe.ucsc.edu/sam-lic/obj.0).
+- Individual scripts may be marked as dedicated to the public domain in the header and may be separated from this work.
+- The following packaged components are GPL v3 and compatible with the overall package license: [GNU Parallel](https://www.gnu.org/software/parallel/) and [FastTree2](https://meta.microbesonline.org/fasttree/)
+- Shogun Toolbox is licensed under [BSD-3](https://github.com/shogun-toolbox/shogun/blob/develop/LICENSE) with optional GPLv3 components
 
-[SAM (align2model,hmmscore,modelfromalign)](http://compbio.soe.ucsc.edu/sam2src/) binaries may be used within LABEL for government and/or academic use only. Commercial use and redistribution for commercial use is excluded. Use of SAM implies this [license](http://compbio.soe.ucsc.edu/sam-lic/obj.0).
+
+## DISCLAIMER & LIMITATION OF LIABILITY
 
 The materials embodied in this software are "as-is" and without warranty of any kind, express, implied or otherwise, including without limitation, any warranty of fitness for a particular purpose. In no event shall the Centers for Disease Control and Prevention (CDC) or the United States (U.S.) Government be liable to you or anyone else for any direct, special, incidental, indirect or consequential damages of any kind, or any damages whatsoever, including without limitation, loss of profit, loss of use, savings or revenue, or the claims of third parties, whether or not CDC or the U.S. Government has been advised of the possibility of such loss, however caused and on any theory of liability, arising out of or in connection with the possession, use or performance of this software.  In no event shall any other party who modifies and/or conveys the program as permitted according to GPL license [[*www.gnu.org/licenses/*](http://www.gnu.org/licenses/)], make CDC or the U.S. government liable for damages, including any general, special, incidental or consequential damages arising out of the use or inability to use the program, including but not limited to loss of data or data being rendered inaccurate or losses sustained by third parties or a failure of the program to operate with any other programs.  Any views, prepared by individuals as part of their official duties as United States government employees or as contractors of the United States government and expressed herein, do not necessarily represent the views of the United States government. Such individuals’ participation in any part of the associated work is not meant to serve as an official endorsement of the software. The CDC and the U.S. government shall not be held liable for damages resulting from any statements arising from use of or promotion of the software that may conflict with any official position of the United States government.
