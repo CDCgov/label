@@ -1,4 +1,4 @@
-LABEL, Lineage Assignment by Extended Learning, version 0.6.4
+LABEL, Lineage Assignment by Extended Learning, version 0.6.5
 Sam Shepard (vfn4@cdc.gov), CDC/OID/NCIRD
 
 HARDWARE.

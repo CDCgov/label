@@ -1,4 +1,5 @@
 {
+    "shellformat.flag": "-i 4 -ci -bn -sr",
     "perltidy-more.autoDisable": true,
     "perltidy-more.profile": ".../.perltidyrc",
     "perl-toolbox.lint.severity": "cruel",
