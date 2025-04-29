@@ -6,7 +6,7 @@ LABEL’s purpose is to quickly, automatically, and correctly assign clades or l
 
 ## METHOD
 
-Lineage Assignment By Extended Learning (LABEL) uses hidden Markov model (HMM) profiles of clade alignments--or groups of clades--to analyze query sequences and then classify them via machine learning techniques. The HMM scoring step is performed via SAM v3.5 (see [*compbio.soe.ucsc.edu/sam.html*](http://compbio.soe.ucsc.edu/sam.html) for more). Prediction is performed hierarchically--usually starting out at a more general level (e.g., a groups of clades) and going to a very specific terminal level (a particular clade). This roughly corresponds to the hierarchical structure of phylogenetic trees and the H5N1 nomenclature system. The prediction phase of LABEL is done via support vector machines (SVM) using the free SHOGUN Machine Learning Toolbox v1.1.0 (multi-class GMNP SVM with polynomial kernel of degree 20, *www.shogun-toolbox.org*). Optional sequence alignment (MUSCLE v3.8.31, see [*www.drive5.com/muscle*](http://www.drive5.com/mus); MAFFT if available, see [mafft.cbrc.jp/alignment/software](http://mafft.cbrc.jp/alignment/software); or via SAM's *align2model* program) and tree-building functions are available to validate LABEL’s predictions  (GTR+GAMMA, 1000 local support bootstraps, maximum-likelihood tree using FastTreeMP v2.1.4, see [*www.microbesonline.org/fasttree*](http://www.microbesonline.org/fasttree)).
+Lineage Assignment By Extended Learning (LABEL) uses hidden Markov model (HMM) profiles of clade alignments--or groups of clades--to analyze query sequences and then classify them via machine learning techniques. The HMM scoring step is performed via SAM v3.5 (see [*compbio.soe.ucsc.edu/sam.html*](http://compbio.soe.ucsc.edu/sam.html) for more). Prediction is performed hierarchically--usually starting out at a more general level (e.g., a groups of clades) and going to a very specific terminal level (a particular clade). This roughly corresponds to the hierarchical structure of phylogenetic trees and the H5N1 nomenclature system. The prediction phase of LABEL is done via support vector machines (SVM) using the free SHOGUN Machine Learning Toolbox v1.1.0 (multi-class GMNP SVM with polynomial kernel of degree 20, <www.shogun-toolbox.org>). Optional sequence alignment (MUSCLE v3.8.31, see [*www.drive5.com/muscle*](http://www.drive5.com/mus); MAFFT if available, see [mafft.cbrc.jp/alignment/software](http://mafft.cbrc.jp/alignment/software); or via SAM's *align2model* program) and tree-building functions are available to validate LABEL’s predictions  (GTR+GAMMA, 1000 local support bootstraps, maximum-likelihood tree using FastTreeMP v2.1.4, see [*www.microbesonline.org/fasttree*](http://www.microbesonline.org/fasttree)).
 
 ## BROADER IMPACT
 
@@ -34,7 +34,7 @@ Usage:
 Example: ./LABEL -C gisaid_H5N1.fa Bird_Flu H5
 ```
 
-## DATA.
+## DATA
 
 - LABEL takes FASTA formatted nucleotide sequences.  The FASTA may be single or multi-line and may contain any number of sequences.  Extra sequences with redundant headers are removed (first-read, first kept)!  Commas and apostrophes are removed from headers while internal spaces are underlined.
 
@@ -71,19 +71,31 @@ We recommend a single multi-core machine with no fewer than 2 cores (8 or more t
 
 ## SOFTWARE PRE-REQUISITES
 
-See "QUICK_INSTALL.txt".
+HARDWARE.
+We recommend a single multi-core machine with no fewer than 2 cores (8 to 12 cores work best) and at least 4 GB of RAM.  LABEL runtime is impacted by the number of cores available on a machine. Use with Mac OS X requires a 64 bit chipset.
+
+SOFTWARE PRE-REQUISITES.
++ Linux (CentOS 7+ or Ubuntu), MacOS 10.14 (intel) or MacOS 11 (arm64)
+ - BASH version 3+
+ - Standard utilities: sleep, cut, paste, jobs, zip, env, cat, cp, getopts.
+ - License: GPL (any)
++ Perl version 5.16 or later
+ - Standard includes: Getopt::Long, File::Basename
+ - License: GPL (any)
+
+INSTALLATION.
+1) Unzip the archive containing LABEL.
+2) Move the file "LABEL" and the directory "LABEL_RES" to a place in your PATH environment variable.  Otherwise, add the directory containing LABEL and LABEL_RES to your PATH.
+3) Restart your terminal emulator. Note: LABEL_RES and LABEL must be in the same folder.
+4) LABEL is now installed.  To test it, execute: LABEL test.fa test_project H9v2011
+5) The file "test.fa" is given in the deployment archive. To access LABEL without using the PATH variable, cd to your extracted directory & substitute "./LABEL" for "LABEL" above.
+
 
 ## PACKAGED SOFTWARE
 
 - SHOGUN version 1.0.0 or later (tested 1.1.0)
   - Purpose: executes the SVM decision phase.
   - License: GPL v3
-- MUSCLE 3.8 or later (tested 3.8.11)
-  - Purpose: optionally align output or control
-  - License: Public Domain
-- FastTreeMP 2.1.4 or later
-  - Purpose: optionally build trees
-  - License: GPL (any)
 - SAM version 3.5 or later
   - Purpose: build HMM profiles, score sequences for evaluation
   - License: Academic/Government, not-for-profit, redistributed with permission
@@ -93,7 +105,7 @@ See "QUICK_INSTALL.txt".
 - Perl scripts
   - Purpose: data manipulation and formatting; calls SHOGUN for SVM use.
   - License: owner, GPL.
-  
+
 ## INSTALLATION
 
 1) Unzip the archive containing LABEL.
@@ -110,12 +122,12 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU General Public License along with this program.  If not, see [*www.gnu.org/licenses/*](http://www.gnu.org/licenses/).
 
-### Additional limitations or flexibilities:
+### Additional limitations or flexibilities
+
 - [SAM (align2model,hmmscore,modelfromalign)](http://compbio.soe.ucsc.edu/sam2src/) binaries may be used within LABEL for government and/or academic use only. Commercial use and redistribution for commercial use is excluded. Use of SAM implies this [license](http://compbio.soe.ucsc.edu/sam-lic/obj.0).
 - Individual scripts may be marked as dedicated to the public domain in the header and may be separated from this work.
 - The following packaged components are GPL v3 and compatible with the overall package license: [GNU Parallel](https://www.gnu.org/software/parallel/) and [FastTree2](https://meta.microbesonline.org/fasttree/)
 - Shogun Toolbox is licensed under [BSD-3](https://github.com/shogun-toolbox/shogun/blob/develop/LICENSE) with optional GPLv3 components
-
 
 ## DISCLAIMER & LIMITATION OF LIABILITY
 
