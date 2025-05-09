@@ -2,14 +2,6 @@
 
 LABEL’s purpose is to quickly (relative to building an MSA and tree), automatically, and correctly assign clades or lineages to nucleotide sequences.  Automated lineage assignment has applications in surveillance, research, and high-throughput database annotation. Additional information is on the [LABEL website](https://wonder.cdc.gov/amd/flu/label/) or you can read the [manuscript].
 
-## METHOD
-
-Lineage Assignment By Extended Learning (LABEL) uses hidden Markov model (HMM) profiles of clade alignments--or groups of clades--to analyze query sequences and then classify them via machine learning techniques. The HMM scoring step is performed via [SAM]. Prediction is performed hierarchically--usually starting out at a more general level (e.g., a groups of clades) and going to a very specific terminal level (a particular clade). This roughly corresponds to the hierarchical structure of phylogenetic trees and the H5N1 nomenclature system. The prediction phase of LABEL is done via support vector machines (SVM) using the free SHOGUN Machine Learning Toolbox v1.1.0 (multi-class GMNP SVM with polynomial kernel of degree 20, <www.shogun-toolbox.org>).
-
-### TRAINING
-
-Training is performed using a combination of support scripts and by manually applied expert knowledge. Generally, a curated and annotated multiple sequence alignment is used along with the [createLABELlevel.sh](createLABELlevel.sh) script.
-
 ## USAGE
 
 ```bash
@@ -56,7 +48,7 @@ LABEL modules are merely directories within the *LABEL\_RES/training\_data* fold
 
 ### Available Modules
 
-Most of the these modules were train by Sam Shepard and/or Ujwal Bagal.
+Most of the these modules were trained by Sam Shepard and/or Ujwal Bagal.
 
 | Module                                                             | Description                                                                                                                                                     |
 | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -117,17 +109,17 @@ docker run --rm -itv $(pwd):/data ghcr.io/cdcgov/label:latest LABEL # label args
 We aggregate and provide [builds of 3rd party software](LABEL_RES/third_party/) for execution at runtime with LABEL. You may install or obtain your own copies and LABEL will detect them, but the user will be required to test for compatibility.
 
 - [GNU Parallel]
-  - Artifacts: parallel
+  - Artifacts: `parallel`
   - Requires: system Perl
   - Purpose: parallelization
   - License: [GPL v3]
 - [SHOGUN] version 1.1.0 (2.1+ is not compatible)
-  - Artifacts: shogun (cmdline_static)
+  - Artifacts: `shogun` (cmdline_static)
   - Provided architectures: linux/x86_64, linux/aarch64, apple/x86_64 (arm64 via Rosetta2)
   - Purpose: executes the SVM decision phase.
   - License: [GPL v3]
 - [SAM] version 3.5
-  - Artifacts: align2model, hmmscore, modelfromalign
+  - Artifacts: `align2model`, `hmmscore`, `modelfromalign`
   - Provided architectures: linux/x86_64, linux/aarch64, apple/universal (arm64 + intel)
   - Purpose: build HMM profiles, score sequences for evaluation
   - License: [Custom][sam-license] academic/government, not-for-profit, redistributed [with permission]
@@ -135,7 +127,13 @@ We aggregate and provide [builds of 3rd party software](LABEL_RES/third_party/) 
 > [!WARNING]
 > Note that [SAM] is redistributed with permission for LABEL but its terms exclude commerical use without a license. If you are a commercial entity, you might need to reach out to the authors to obtain their [custom][sam-license] license.
 
-## DISCLAIMER & LIMITATION OF LIABILITY
+## METHOD
+
+Lineage Assignment By Extended Learning (LABEL) uses hidden Markov model (HMM) profiles of clade alignments--or groups of clades--to analyze query sequences and then classify them via machine learning techniques. The HMM scoring step is performed via [SAM]. Prediction is performed hierarchically--usually starting out at a more general level (e.g., a groups of clades) and going to a very specific terminal level (a particular clade). This roughly corresponds to the hierarchical structure of phylogenetic trees and the H5N1 nomenclature system. The prediction phase of LABEL is done via support vector machines (SVM) using the free SHOGUN Machine Learning Toolbox v1.1.0 (multi-class GMNP SVM with polynomial kernel of degree 20, <www.shogun-toolbox.org>).
+
+### TRAINING
+
+Training is performed using a combination of support scripts and by manually applied expert knowledge. Generally, a curated and annotated multiple sequence alignment is used along with the [createLABELlevel.sh](createLABELlevel.sh) script.
 
 ## Notices
 
@@ -172,7 +170,7 @@ The materials embodied in this software are "as-is" and without warranty of any 
 [manuscript]: http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0086921
 [GNU Parallel]: https://www.gnu.org/software/parallel/
 [with permission]: LABEL_RES/third_party/copyright_and_licenses/sam3.5/SAM%20Redistribution%20Special%20Permissions.pdf
-[GPL v3]: LABEL_RES/third_party/copyright_and_licenses/sam3.5/gpl-3.0.txt
+[GPL v3]: https://www.gnu.org/licenses/gpl-3.0.txt
 [SHOGUN]: https://github.com/shogun-toolbox/
 [sam-license]: https://users.soe.ucsc.edu/~karplus/projects-compbio-html/sam-lic/obj.0
 [SAM]: https://users.soe.ucsc.edu/~karplus/projects-compbio-html/sam2src/

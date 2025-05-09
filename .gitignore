@@ -3,5 +3,5 @@ log.txt
 LABEL_RES/training_data/B_HA-old/
 LABEL_RES/test_data/
 tests
-.*DS_Store
+.DS_Store
 LABEL_RES/training_data/meno-H1

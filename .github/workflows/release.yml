@@ -10,6 +10,7 @@ permissions: {}
 env:
   CARGO_TERM_COLOR: always
   RELEASE_BIN: label
+  RELEASE_BASE: flu-amd
   REGISTRY: ghcr.io
 
 jobs:
@@ -28,33 +29,32 @@ jobs:
         shell: bash
         run: |
           CHANGELOG_CONTENT=$(perl .github/scripts/last_release_notes.pl)
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo -e "changelog<<EOF\n$CHANGELOG_CONTENT\nEOF" >> $GITHUB_OUTPUT
 
       - name: Create Source Code Archive
         id: create_archive
         shell: bash
         run: |
-          ARCHIVE_NAME="${{ env.RELEASE_BIN }}-${{ github.ref_name }}-universal.zip"
-          rm -rf .git* .vscode .docker* .*rc Dockerfile \
-          && zip -r "${ARCHIVE_NAME}" . \
-          && echo "archive_name=${ARCHIVE_NAME}" >> $GITHUB_OUTPUT
+          ARCHIVE_NAME="$RUNNER_TEMP/${{ env.RELEASE_BIN }}-${{ github.ref_name }}-universal.zip"
+          base=${{ env.RELEASE_BASE }}
+
+          cd .. && mv label $base \
+          && zip -r "${ARCHIVE_NAME}" . -x "$base/.git*" "$base/.vscode" "$base/.docker*" "$base/.*rc" "$base/Dockerfile" \
+          && echo "archive_name=${ARCHIVE_NAME}" >> $GITHUB_OUTPUT \
+          && mv $base label
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v2
-        with:
-          body: ${{ steps.extract_changelog.outputs.changelog }}
-          draft: false
-          prerelease: false
-          files: ${{ steps.create_archive.outputs.archive_name }}
+        shell: bash
+        run: |
+          gh release create "${{ github.ref_name }}" "${{ steps.create_archive.outputs.archive_name }}" \
+          --title "${{ github.ref_name }}" \
+          --notes "${{ steps.extract_changelog.outputs.changelog }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-release-images:
     name: Build and Push Release Image
-    needs: [create-release]
     strategy:
       matrix:
         include:
