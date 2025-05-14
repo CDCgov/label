@@ -6,55 +6,11 @@
 # Author: Samuel S. Shepard et al. (vfn4@cdc.gov)
 
 PROGRAM="LABEL"
-YEAR="2024"
-VERSION="v0.6.5"
+YEAR="2025"
+VERSION="v0.7.0"
 AUTHOR="Samuel S. Shepard"
 EMAIL="vfn4@cdc.gov"
 AFFIL="Centers for Disease Control & Prevention"
-
-# GPL version 3
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-#
-# DICLAIMER & LIMITATION OF LIABILITY.
-#
-# The materials embodied in this software are "as-is" and without warranty
-# of any kind, express, implied or otherwise, including without limitation,
-# any warranty of fitness for a particular purpose. In no event shall the
-# Centers for Disease Control and Prevention (CDC) or the United States (U.S.)
-# Government be liable to you or anyone else for any direct, special, incidental,
-# indirect or consequential damages of any kind, or any damages whatsoever,
-# including without limitation, loss of profit, loss of use, savings or revenue,
-# or the claims of third parties, whether or not CDC or the U.S. Government has
-# been advised of the possibility of such loss, however caused and on any theory
-# of liability, arising out of or in connection with the possession, use or
-# performance of this software.  In no event shall any other party who modifies
-# and/or conveys the program as permitted according to GPL license
-# [www.gnu.org/licenses/], make CDC or the U.S. government liable for damages,
-# including any general, special, incidental or consequential damages arising out
-# of the use or inability to use the program, including but not limited to loss
-# of data or data being rendered inaccurate or losses sustained by third parties
-# or a failure of the program to operate with any other programs.  Any views,
-# prepared by individuals as part of their official duties as United States
-# government employees or as contractors of the United States government and
-# expressed herein, do not necessarily represent the views of the United States
-# government. Such individuals’ participation in any part of the associated work
-# is not meant to serve as an official endorsement of the software. The CDC and
-# the U.S. government shall not be held liable for damages resulting from any
-# statements arising from use of or promotion of the software that may conflict
-# with any official position of the United States government.
-#
 
 ################
 # INSTALLATION #
@@ -67,16 +23,6 @@ if [ "$bpath" == "" ]; then
     bpath=$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 fi
 resources=LABEL_RES
-
-# OS and ARCH
-if [ -x "$(which uname)" ]; then
-    OS=$(uname -s)
-    if [ "$(uname -m)" != "x86_64" -a "$OS" == "Linux" ]; then
-        OS="Linux32"
-    fi
-else
-    OS="Linux"
-fi
 
 ## SHELL VARS ##
 LANG=POSIX
@@ -104,15 +50,10 @@ function cd_or_die() {
     cd "$p" || die "Cannot cd to '$p', aborting."
 }
 
-# FNC - HELP #
 function print_usage() {
     echoerr "\n$PROGRAM $VERSION, updated $YEAR\n$AUTHOR ($EMAIL), $AFFIL"
-    echoerr "GPL version 3. This program comes with ABSOLUTELY NO WARRANTY. This is free software."
-    echoerr "You are welcome to redistribute it under certain conditions. See:  <http://www.gnu.org/licenses/>.\n\n"
-    echoerr "Usage:\n\t$(basename $PROGRAM) [-P MAX_PROC] [-E C_OPT] [-W WRK_PATH|-O OUT_PATH] [-G|-TACRD|-S] [-L LIN_PATH] <nts.fasta> <project> <Module:H5,H9,etc.>"
+    echoerr "Usage:\n\t$(basename $PROGRAM) [-E C_OPT] [-W WRK_PATH|-O OUT_PATH] [-TRD|-S] [-L LIN_PATH] <nts.fasta> <project> <Module:H5,H9,etc.>"
     echoerr "\t\t-T\tDo TRAINING again instead of using classifier files."
-    echoerr "\t\t-A\tDo ALIGNMENT of re-annotated fasta file (sorted by clade) & build its ML tree."
-    echoerr "\t\t-C\tDo CONTROL alignment & ML tree construction."
     echoerr "\t\t-E\tSGE clustering option. Use 1 or 2 for SGE with array jobs, else local."
     echoerr "\t\t-R\tNo RECURSIVE prediction. Limits scope, useful with -L option."
     echoerr "\t\t-D\tNo DELETION of extra intermediary files."
@@ -122,7 +63,6 @@ function print_usage() {
     echoerr "Example: $0 -C gisaid_H5N1.fa Bird_Flu H5\n"
 }
 
-# FNC - ERROR TEST #
 # Idea courtesy: steve-parker.org/sh/exitcodes.shtml
 function err_test() {
     if [ "$1" -ne "0" ]; then
@@ -139,7 +79,6 @@ function err_test() {
     fi
 }
 
-# FNC - CHECK PROGRAM #
 # Idea courtesy: stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
 function check_prgm() {
     command -v "$1" > /dev/null 2>&1 || die "Program '$1' not found, please check your PATH or install it."
@@ -149,10 +88,8 @@ function check_prgm() {
 LOCAL_PROC=${IFX_LOCAL_PROCS:-16} # MAX CONCURRENT PARALLEL
 GRID_PROC=128                     # MAX CONCURRENT GRID PROCESSORS
 DO_TRAIN=0                        # Use original data for training.
-DO_CONTROL=0                      # Control tree computation (for debugging)
 NO_RECURSION=0                    # Do not use recursion.
 NO_DELETE=0                       # Do not clean up extra data.
-DO_ALIGNMENT=0                    # Alignment of query sequences.
 DO_WEB=0                          # Web-server mode
 DO_OUT=0
 LINEAGE_PATH=""
@@ -167,27 +104,13 @@ check_prgm paste
 check_prgm perl
 check_prgm /usr/bin/env
 
-mafft=mafft
-if command -v "$mafft" > /dev/null 2>&1; then
-    USE_MAFFT=1
-else
-    USE_MAFFT=0
-fi
-
 while getopts "GE:TACRDSW:L:O:h" option; do
     case $option in
-        G)
-            echoerr "LABEL: option 'G' removed. Please use 'LEVEL_trace.tab' (in combo with -R <lineage/path>) for visualization."
-            exit 0
-            ;;
         E)
             CLUSTER_OPT=$OPTARG
             ;;
         T)
             DO_TRAIN=1
-            ;;
-        C)
-            DO_CONTROL=1
             ;;
         R)
             NO_RECURSION=1
@@ -208,9 +131,6 @@ while getopts "GE:TACRDSW:L:O:h" option; do
         S)
             ls "$bpath"/$resources/training_data/
             exit 0
-            ;;
-        A)
-            DO_ALIGNMENT=1
             ;;
         W)
             DO_WEB=1
@@ -247,13 +167,34 @@ inputFasta=${args[$OPTIND - 1]}
 project=${args[$OPTIND]}
 module=${args[$OPTIND + 1]}
 owd=$(pwd)
-bin="$bpath"/$resources/scripts
-hmmscore="$bin"/hmmscore_$OS
-align2model="$bin"/align2model_$OS
-muscle="$bin"/muscle_$OS
-FastTreeMP="$bin"/FastTreeMP_$OS
-shogun="$bin"/shogun_$OS
-PARALLEL="$bin/parallel"
+bin="$bpath/$resources/scripts"
+vendorp=$bpath/$resources/third_party
+
+function set_bin() {
+    unalias "$1" 2> /dev/null
+
+    command -v "$1" 2> /dev/null || {
+        local cmd="$vendorp/${1}"
+        if [ -x "$cmd" ]; then
+            echo "$cmd"
+        else
+            local target="$(uname -s)"
+            [[ "$target" == "Linux" ]] && target+="_$(uname -m)"
+
+            cmd+="_$target"
+            if [ -x "$cmd" ]; then
+                echo "$cmd"
+            else
+                die "Could could not find program: $1"
+            fi
+        fi
+    }
+}
+export -f set_bin
+
+PARALLEL=$(set_bin parallel)
+hmmscore=$(set_bin hmmscore)
+shogun=$(set_bin shogun)
 
 if [ "$DO_WEB" -eq "0" ]; then
     tpath="$bpath"/$resources/test_data
@@ -278,41 +219,6 @@ fi
 level=$(basename "$grouping")
 
 [ ! -d "$tnpath" ] && die "module '$module' does not exist. Try: LABEL -S"
-
-# FNC - DO_ALIGNMENT #
-# Perform a mafft alignment if available, otherwise use muscle.
-function doAlignment() {
-    local in=$1
-    local out=$2
-
-    if [ $DO_WEB -eq 0 ]; then
-        if [ $USE_MAFFT -eq 1 ]; then
-            "$mafft" --maxiterate 1000 --thread -1 "$in" > "$out"
-        else
-            "$muscle" -in "$in" -out "$out"
-        fi
-    else
-        if [ $USE_MAFFT -eq 1 ]; then
-            "$mafft" --maxiterate 1000 --thread -1 "$in" > "$out" 2> /dev/null
-        else
-            "$muscle" -in "$in" -out "$out" > /dev/null 2>&1
-        fi
-    fi
-    rm "$in"
-}
-
-# FNC - DO_HMM_ALIGNMENT #
-# Performs alignment using SAM's align2model.
-function doHMMalignment() {
-    local in=$1
-    local out=$2
-    local mod=$3
-
-    cd_or_die "$ppath"/FASTA
-    "$align2model" "$out" -db "$in" -modelfile "$mod" > /dev/null 2>&1
-    "$bin"/removeInsertionStates.pl "$out".a2m > "$out"
-    rm "$in" "$out".a2m
-}
 
 # FNC - DO_ANALYSIS #
 # Main recursive function for prediction at each level.
@@ -539,83 +445,6 @@ mv "$ppath/${project}_${level}.fas" "$ppath/FASTA/${project}_predictions.fas" \
     && "$bin"/partitionTaxa.pl "$ppath/FASTA/${project}_reannotated.fas" "$ppath/FASTA/" -P "${project}_clade_" \
     && cat "$ppath/FASTA/${project}_clade"* > "$ppath/FASTA/${project}_reannotated.fas" \
     || die "FASTA input processing failed."
-
-if [ $DO_ALIGNMENT -eq 1 -a $DO_CONTROL -eq 1 ]; then
-    ((DO_WEB)) || echoerr "LABEL: Performing alignments."
-    if [ -r "$tnpath/x-control/control.mod" ]; then
-        doAlignment "$ppath/FASTA/${project}_reannotated.fas" "$ppath/FASTA/${project}_ordered.fasta" "$module" &
-        "$bin"/interleavedSamples.pl -G "$LOCAL_PROC" "$ppath/FASTA/${project}_predictions.fas" "$ppath/FASTA/${module}_control" -X tmp > /dev/null 2>&1
-        for sample in "$ppath/FASTA/${module}_control"*tmp; do
-            doHMMalignment "$sample" "$(basename "$sample").fasta" "$tnpath"/x-control/control.mod &
-        done
-        wait
-        cat "$tnpath"/x-control/guide.fasta "$ppath/FASTA/${module}_control"*tmp.fasta > "$ppath/FASTA/${module}_control.fasta" \
-            && rm "$ppath/FASTA/${module}_control"*tmp.fasta
-    else
-        cat "$tnpath/${module}_downsample.fa" "$ppath/FASTA/${project}_predictions.fas" > "$ppath/FASTA/${module}_control.fa"
-        doAlignment "$ppath/FASTA/${module}_control.fa" "$ppath/FASTA/${module}_control.fasta" "$module" &
-        doAlignment "$ppath/FASTA/${project}_reannotated.fas" "$ppath/FASTA/${project}_ordered.fasta" "$module" &
-        wait
-    fi
-
-    "$bin"/sortByAnnotation.pl "$ppath/FASTA/${project}_ordered.fasta" > "$ppath/FASTA/${project}_ordered.fasta2"
-    mv "$ppath/FASTA/${project}_ordered.fasta2" "$ppath/FASTA/${project}_ordered.fasta"
-    if [ $DO_WEB -eq 1 ]; then
-        "$FastTreeMP" -quiet -quote -nt -gtr -gamma -boot 1000 < "$ppath/FASTA/${project}_ordered.fasta" \
-            > "$ppath/FASTA/${project}_tree.nwk" 2> /dev/null \
-            && "$FastTreeMP" -quiet -quote -nt -gtr -gamma -boot 1000 < "$ppath/FASTA/${module}_control.fasta" \
-                > "$ppath/FASTA/${module}_control.nwk" 2> /dev/null
-    else
-        echoerr ""
-        echoerr "LABEL: Calculating maximum likelihood trees."
-        echoerr ""
-        "$FastTreeMP" -quote -nt -gtr -gamma -boot 1000 < "$ppath/FASTA/${project}_ordered.fasta" > "$ppath/FASTA/${project}_tree.nwk"
-        "$FastTreeMP" -quote -nt -gtr -gamma -boot 1000 < "$ppath/FASTA/${module}_control.fasta" > "$ppath/FASTA/${module}_control.nwk"
-        echoerr ""
-    fi
-else
-    # DO NORMAL TREE/ALIGNMENT #
-    if [ $DO_ALIGNMENT -eq 1 ]; then
-        ((DO_WEB)) || echoerr "LABEL: Making ordered alignment & tree"
-        doAlignment "$ppath/FASTA/${project}_reannotated.fas" "$ppath/FASTA/${project}_ordered.fasta" "$module" \
-            && "$bin"/sortByAnnotation.pl "$ppath/FASTA/${project}_ordered.fasta" > "$ppath/FASTA/${project}_ordered.fasta2" \
-            && mv "$ppath/FASTA/${project}_ordered.fasta2" "$ppath/FASTA/${project}_ordered.fasta"
-        if [ $DO_WEB -eq 1 ]; then
-            "$FastTreeMP" -quiet -quote -nt -gtr -gamma -boot 1000 < "$ppath/FASTA/${project}_ordered.fasta" \
-                > "$ppath/FASTA/${project}_tree.nwk" 2> /dev/null
-        else
-            echoerr ""
-            "$FastTreeMP" -quote -nt -gtr -gamma -boot 1000 < "$ppath/FASTA/${project}_ordered.fasta" > "$ppath/FASTA/${project}_tree.nwk"
-            echoerr ""
-        fi
-    # DO CONTROL TREE/ALIGNMENT #
-    elif [ $DO_CONTROL -eq 1 ]; then
-        ((DO_WEB)) || echoerr "LABEL: Aligning control datasets."
-
-        if [ -r "$tnpath/x-control/control.mod" ]; then
-            "$bin"/interleavedSamples.pl -G "$LOCAL_PROC" "$ppath/FASTA/${project}_predictions.fas" "$ppath/FASTA/${module}_control" -X tmp > /dev/null 2>&1
-            for sample in "$ppath/FASTA/${module}_control"*tmp; do
-                doHMMalignment "$sample" "$(basename "$sample").fasta" "$tnpath"/x-control/control.mod &
-            done
-            wait
-            cat "$tnpath"/x-control/guide.fasta "$ppath/FASTA/${module}_control"*tmp.fasta > "$ppath/FASTA/${module}_control.fasta"
-            rm "$ppath/FASTA/${module}_control"*tmp.fasta
-        else
-            cat "$tnpath/${module}_downsample.fa" "$ppath/FASTA/${project}_predictions.fas" > "$ppath/FASTA/${module}_control.fa"
-            doAlignment "$ppath/FASTA/${module}_control.fa" "$ppath/FASTA/${module}_control.fasta" "$module"
-        fi
-
-        if [ $DO_WEB -eq 1 ]; then
-            "$FastTreeMP" -quiet -quote -nt -gtr -gamma -boot 1000 < "$ppath/FASTA/${module}_control.fasta" \
-                > "$ppath/FASTA/${module}_control.nwk" 2> /dev/null
-        else
-            echoerr ""
-            echoerr "LABEL: Calculating maximum likelihood."
-            "$FastTreeMP" -quote -nt -gtr -gamma -boot 1000 < "$ppath/FASTA/${module}_control.fasta" > "$ppath/FASTA/${module}_control.nwk"
-            echoerr ""
-        fi
-    fi
-fi
 
 # CLEAN UP #
 if [ "$IS_PIPE" -eq "1" ]; then
