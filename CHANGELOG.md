@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. The format is roughly based on [Keep a Changelog], and this project tries to adheres to [Semantic Versioning]. For IRMA vs IRMA-core compatibility, please see the [version matrix](VERSION_MATRIX.md).
 
-## [0.7.0] - TBD
+## [0.7.0] - 2025-05-14
 
 ### Changes
 
@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file. The format 
 
 - Adds module 'H5v2023' with updated 2321 and 2344 subclades.
 
-## [0.6.4] - 2022-04-12
+## [0.6.4] - 2022-09-23
 
 - Updated docs and H1pdm09 module
 
