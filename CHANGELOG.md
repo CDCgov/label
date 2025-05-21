@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. The format is roughly based on [Keep a Changelog], and this project tries to adheres to [Semantic Versioning]. For IRMA vs IRMA-core compatibility, please see the [version matrix](VERSION_MATRIX.md).
 
+## [0.7.1] - 2025-05-21
+
+### Fixes
+
+- The *Additional Standard Notices* section still contained information related to LABEL's old licensing, this has been fixed and made compliant.
+
 ## [0.7.0] - 2025-05-14
 
 ### Changes
@@ -25,6 +31,7 @@ All notable changes to this project will be documented in this file. The format 
 
 <!-- Versions -->
 
+[0.7.1]: https://github.com/CDCgov/label/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/CDCgov/label/compare/v0.6.5...v0.7.0
 [0.6.5]: https://github.com/CDCgov/label/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/CDCgov/label/compare/v0.6.3...v0.6.4
