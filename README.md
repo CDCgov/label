@@ -115,7 +115,7 @@ We aggregate and provide [builds of 3rd party software](LABEL_RES/third_party/) 
   - License: [GPL v3]
 - [SHOGUN] version 1.1.0 (2.1+ is not compatible)
   - Artifacts: `shogun` (cmdline_static)
-  - Provided architectures: linux/x86_64, linux/aarch64, apple/x86_64 (arm64 via Rosetta2)
+  - Provided architectures: linux/x86_64, linux/aarch64, apple/universal (*[arm64][arm64-mac-build] + intel)
   - Purpose: executes the SVM decision phase.
   - License: [GPL v3]
 - [SAM] version 3.5
@@ -126,6 +126,8 @@ We aggregate and provide [builds of 3rd party software](LABEL_RES/third_party/) 
 
 > [!WARNING]
 > Note that [SAM] is redistributed with permission for LABEL but its terms exclude commerical use without a license. If you are a commercial entity, you might need to reach out to the authors to obtain their [custom][sam-license] license.
+
+* Minor modifications to allow compilation of the legacy software.
 
 ## METHOD
 
@@ -175,3 +177,4 @@ Please refer to [CDC's Template Repository](https://github.com/CDCgov/template) 
 [sam-license]: https://users.soe.ucsc.edu/~karplus/projects-compbio-html/sam-lic/obj.0
 [SAM]: https://users.soe.ucsc.edu/~karplus/projects-compbio-html/sam2src/
 [IRMA]: https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-016-3030-6
+[arm64-mac-build]: https://github.com/sammysheep/shogun/releases/tag/v110-mac-arm-build
