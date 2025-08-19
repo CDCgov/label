@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. The format is roughly based on [Keep a Changelog], and this project tries to adheres to [Semantic Versioning]. For IRMA vs IRMA-core compatibility, please see the [version matrix](VERSION_MATRIX.md).
 
+
+## [0.7.2] - 2025-08-15
+
+### Added
+
+- The static build of legacy `shogun` in the third-party distribution is now a fat/universal binary for macOS offering native arm64 support.
+
 ## [0.7.1] - 2025-05-21
 
 ### Fixes
