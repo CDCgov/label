@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. The format is roughly based on [Keep a Changelog], and this project tries to adheres to [Semantic Versioning]. For IRMA vs IRMA-core compatibility, please see the [version matrix](VERSION_MATRIX.md).
 
+## [0.7.3] - TBD
+
+### Security
+
+- All releases are being updated to immutable and versions 0.7.2+ will have release attestations.
+- Added signed SHA-256 checksum files to historical v0.6.4 and v0.7.0 GitHub release assets. Each checksum is accompanied by a Sigstore bundle so that the checksum can be authenticated with `cosign verify-blob` before being used to verify the downloaded archive. LABEL v0.7.1 has a checksum noted in its release notes intead of a file.
 
 ## [0.7.2] - 2025-08-15
 
@@ -38,6 +44,7 @@ All notable changes to this project will be documented in this file. The format 
 
 <!-- Versions -->
 
+[0.7.3]: https://github.com/CDCgov/label/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/CDCgov/label/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/CDCgov/label/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/CDCgov/label/compare/v0.6.5...v0.7.0
@@ -47,4 +54,3 @@ All notable changes to this project will be documented in this file. The format 
 <!-- Links -->
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
-

@@ -1,0 +1,111 @@
+name: Backfill release checksum
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Historical release to backfill
+        required: true
+        type: choice
+        options:
+          - v0.6.4
+          - v0.7.0
+
+permissions: {}
+
+concurrency:
+  group: backfill-release-checksum-${{ inputs.release }}
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: Sign and upload ${{ inputs.release }} checksum
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ inputs.release }}
+    steps:
+      - name: Select reviewed release asset
+        id: release
+        shell: bash
+        run: |
+          case "$RELEASE_TAG" in
+            v0.6.4)
+              asset="flu-amd-LABEL-202209.zip"
+              expected="ddb32de66e2862cf3c0acb5301eb7c1731dfa5daacea31fced740cc77db8ef02"
+              ;;
+            v0.7.0)
+              asset="label-v0.7.0-universal.zip"
+              expected="a47df21dfe9a88a8abf09677356a23ebaff946d3e61f8a8d38e1bf15992f1b70"
+              ;;
+            *)
+              echo "Unsupported release: $RELEASE_TAG" >&2
+              exit 1
+              ;;
+          esac
+
+          echo "asset=$asset" >> "$GITHUB_OUTPUT"
+          echo "expected=$expected" >> "$GITHUB_OUTPUT"
+
+      - name: Require a mutable release
+        shell: bash
+        run: |
+          immutable=$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --json isImmutable --jq '.isImmutable')
+          if [[ "$immutable" == "true" ]]; then
+            echo "$RELEASE_TAG is immutable; release assets cannot be added" >&2
+            exit 1
+          fi
+
+      - name: Refuse to overwrite existing backfill assets
+        env:
+          ASSET_NAME: ${{ steps.release.outputs.asset }}
+        shell: bash
+        run: |
+          checksum_name="${ASSET_NAME}.sha256"
+          bundle_name="${checksum_name}.sigstore.json"
+          existing=$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --json assets --template '{{range .assets}}{{.name}}{{"\n"}}{{end}}')
+
+          if grep -Fxq "$checksum_name" <<< "$existing" || \
+             grep -Fxq "$bundle_name" <<< "$existing"; then
+            echo "A checksum or signature bundle already exists for $ASSET_NAME" >&2
+            exit 1
+          fi
+
+      - name: Download and verify existing release asset
+        env:
+          ASSET_NAME: ${{ steps.release.outputs.asset }}
+          EXPECTED_SHA256: ${{ steps.release.outputs.expected }}
+        shell: bash
+        run: |
+          mkdir release
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern "$ASSET_NAME" --dir release
+          cd release
+          printf '%s  %s\n' "$EXPECTED_SHA256" "$ASSET_NAME" | sha256sum --check --strict
+          printf '%s  %s\n' "$EXPECTED_SHA256" "$ASSET_NAME" > "${ASSET_NAME}.sha256"
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v4.1.2
+
+      - name: Sign checksum with GitHub OIDC identity
+        env:
+          ASSET_NAME: ${{ steps.release.outputs.asset }}
+        shell: bash
+        run: |
+          checksum="release/${ASSET_NAME}.sha256"
+          cosign sign-blob --yes "$checksum" \
+            --bundle "${checksum}.sigstore.json"
+
+      - name: Upload checksum and signature bundle
+        env:
+          ASSET_NAME: ${{ steps.release.outputs.asset }}
+        shell: bash
+        run: |
+          checksum="release/${ASSET_NAME}.sha256"
+          gh release upload "$RELEASE_TAG" "$checksum" "${checksum}.sigstore.json" \
+            --repo "$GITHUB_REPOSITORY"
