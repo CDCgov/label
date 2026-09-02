@@ -6,8 +6,8 @@
 # Author: Samuel S. Shepard et al. (sshepard@cdc.gov)
 
 PROGRAM="LABEL"
-YEAR="2025"
-VERSION="v0.7.1"
+YEAR="2026"
+VERSION="v0.7.3"
 AUTHOR="Samuel S. Shepard"
 EMAIL="vfn4@cdc.gov"
 AFFIL="Centers for Disease Control & Prevention"
@@ -196,15 +196,26 @@ PARALLEL=$(set_bin parallel)
 hmmscore=$(set_bin hmmscore)
 shogun=$(set_bin shogun)
 
+TOKEN=$(perl -e '@chars = ("A".."Z","0".."9","a".."z");print $chars[int(rand(scalar(@chars)))] for 1..32;')
 if [ "$DO_WEB" -eq "0" ]; then
-    tpath="$bpath"/$resources/test_data
-    ppath="$bpath"/$resources/test_data/${project}
     check_prgm zip
+
+    tpath="$bpath"/$resources/test_data
+    if [ ! -w "$tpath" ]; then
+        WHOAMI_DIR=$(whoami 2> /dev/null || echo "container-user")
+        tpath=/tmp/$WHOAMI_DIR/LABELv$VERSION
+    fi
+
+    ppath="$tpath"/${project}-${TOKEN}
 else
-    ppath="$tpath"/${project}
+    ppath="$tpath"/${project}-${TOKEN}
 fi
 
-[ -d "$ppath" ] && die "Project currently in use. See: '$ppath'" || mkdir -p "$ppath"
+if [ -d "$ppath" ]; then
+    die "Project currently in use. See: '$ppath'"
+else
+    mkdir -p "$ppath" || die "Cannot create project path: $ppath"
+fi
 
 if [ "$LINEAGE_PATH" != "" ]; then
     tnpath="$bpath"/$resources/training_data/$module/$LINEAGE_PATH
@@ -454,8 +465,13 @@ elif [ "${DO_WEB:-0}" -eq 1 ]; then
     echo "$ppath"
 else
     cd_or_die "$tpath"
-    zip -q -r "${project}.zip" "$project"
+    unzipped_dir="${project}-${TOKEN}"
+    if [ ! -d "$project" ]; then
+        mv "${project}-${TOKEN}" "$project"
+        unzipped_dir=$project
+    fi
+    zip -q -r "${project}.zip" "$unzipped_dir"
+    rm -rf "$unzipped_dir"
     cd_or_die "$owd"
     mv "$tpath/${project}.zip" "$OUTPUT_DIR"
-    rm -rf "$ppath"
 fi

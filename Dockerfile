@@ -1,10 +1,10 @@
-FROM debian:bookworm-slim AS builder
+FROM debian:trixie-slim AS builder
 
 WORKDIR /app
 COPY . .
 RUN ./.dockerclean.sh && rm ./.dockerclean.sh
 
-FROM debian:bookworm-slim AS base
+FROM dhi.io/debian-base:trixie-dev AS base
 
 
 ARG APT_MIRROR_NAME=
@@ -13,10 +13,12 @@ RUN apt-get update --allow-releaseinfo-change --fix-missing \
     && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y procps zip perl \
     && apt clean autoclean \
     && apt autoremove --yes \
-    && rm -rf /var/lib/{apt,dpkg,cache,log}/
+    && rm -rf /var/lib/apt/lists/* /var/cache/* /var/log/* /tmp/* /var/tmp/*
 
 WORKDIR /app
 COPY  --from=builder /app /app
+
+USER nonroot
 
 ENV PATH="/app:${PATH}"
 WORKDIR /data
