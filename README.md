@@ -5,8 +5,6 @@ LABEL’s purpose is to quickly (relative to building an MSA and tree), automati
 ## USAGE
 
 ```bash
-LABEL v0.7.0, updated 2025
-Samuel S. Shepard (vfn4@cdc.gov), Centers for Disease Control & Prevention
 Usage:
         LABEL [-E C_OPT] [-W WRK_PATH|-O OUT_PATH] [-TRD|-S] [-L LIN_PATH] <nts.fasta> <project> <Module:H5,H9,etc.>
                 -T      Do TRAINING again instead of using classifier files.

@@ -2,12 +2,17 @@
 
 All notable changes to this project will be documented in this file. The format is roughly based on [Keep a Changelog], and this project tries to adheres to [Semantic Versioning]. For IRMA vs IRMA-core compatibility, please see the [version matrix](VERSION_MATRIX.md).
 
-## [0.7.3] - TBD
+## [0.7.3] - 2026-09-02
+
+### Changes
+
+- LABEL will attempt to use randomized directories to avoid collisions.
 
 ### Security
 
 - All releases are being updated to immutable and versions 0.7.2+ will have release attestations.
-- Added signed SHA-256 checksum files to historical v0.6.4 and v0.7.0 GitHub release assets. Each checksum is accompanied by a Sigstore bundle so that the checksum can be authenticated with `cosign verify-blob` before being used to verify the downloaded archive. LABEL v0.7.1 has a checksum noted in its release notes intead of a file.
+- Added signed SHA-256 checksum files to historical v0.6.4 and v0.7.0 GitHub release assets. Each checksum is accompanied by a Sigstore bundle so that the checksum can be authenticated with `cosign verify-blob` before being used to verify the downloaded archive. LABEL v0.7.1 has a checksum noted in its release notes instead of a file.
+- Docker hardened images + trixie now used for new LABEL container builds. Images are now signed.
 
 ## [0.7.2] - 2025-08-15
 

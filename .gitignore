@@ -5,3 +5,5 @@ LABEL_RES/test_data/
 tests
 .DS_Store
 LABEL_RES/training_data/meno-H1
+test*.zip
+test*.txt

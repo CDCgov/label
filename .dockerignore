@@ -2,3 +2,6 @@
 Dockerfile
 LABEL_RES/test_data/*
 !.dockerclean.sh
+test*.zip
+test*.txt
+/*.fa
